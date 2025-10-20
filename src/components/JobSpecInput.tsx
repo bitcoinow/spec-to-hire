@@ -4,6 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sparkles, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import type { MasterProfile, GeneratedResults } from "@/pages/Index";
 
 interface JobSpecInputProps {
@@ -47,39 +48,47 @@ export const JobSpecInput = ({
     setIsGenerating(true);
 
     try {
-      // TODO: Integrate with Lovable AI for parsing and generation
-      // For now, showing a mock result
-      const mockResults: GeneratedResults = {
-        parsed_job: {
-          title: "Sample Role",
-          company: "Sample Company",
-          must_have: ["Skill 1", "Skill 2"],
-          nice_to_have: ["Skill 3"],
-          keywords: ["keyword1", "keyword2"],
-          responsibilities: ["Responsibility 1", "Responsibility 2"],
+      console.log('Calling generate-cv function...');
+      
+      const { data, error } = await supabase.functions.invoke('generate-cv', {
+        body: {
+          jobSpec,
+          masterProfile,
         },
-        match: {
-          score: 0.85,
-          keyword_hits: ["keyword1", "keyword2"],
-          skill_gaps: [],
-          tool_matches: ["Tool 1"],
-        },
-        cv_text: "Sample CV content...",
-        cover_letter: "Sample cover letter content...",
-      };
+      });
 
-      onGenerate(mockResults);
+      if (error) {
+        console.error('Function error:', error);
+        throw error;
+      }
+
+      if (!data) {
+        throw new Error('No data returned from function');
+      }
+
+      console.log('Generation successful:', data);
+      onGenerate(data);
 
       toast({
         title: "Success!",
         description: "CV and cover letter generated successfully",
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Generation error:', error);
+      
+      let errorMessage = "Failed to generate documents. Please try again.";
+      if (error.message?.includes('429') || error.message?.includes('rate limit')) {
+        errorMessage = "Rate limit exceeded. Please try again in a moment.";
+      } else if (error.message?.includes('402') || error.message?.includes('credits')) {
+        errorMessage = "AI credits depleted. Please add credits to continue.";
+      }
+      
       toast({
         title: "Generation failed",
-        description: "Failed to generate documents. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
+    } finally {
       setIsGenerating(false);
     }
   };
