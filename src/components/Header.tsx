@@ -1,10 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Briefcase, LogOut } from "lucide-react";
+import { Briefcase, LogOut, User as UserIcon, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { User } from "@supabase/supabase-js";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const Header = () => {
   const navigate = useNavigate();
@@ -60,20 +68,31 @@ export const Header = () => {
         </div>
 
         {user && (
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">
-              {user.email}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleSignOut}
-              className="flex items-center gap-2"
-            >
-              <LogOut className="w-4 h-4" />
-              Sign Out
-            </Button>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="flex items-center gap-2">
+                <UserIcon className="h-4 w-4" />
+                <span className="hidden sm:inline">{user?.email}</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate('/app?tab=profile')}>
+                <UserIcon className="mr-2 h-4 w-4" />
+                <span>Profile</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/app?tab=profile')}>
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Settings</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Sign Out</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
       </div>
     </header>

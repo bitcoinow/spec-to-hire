@@ -5,6 +5,7 @@ import { JobSpecInput } from "@/components/JobSpecInput";
 import { ProfileEditor } from "@/components/ProfileEditor";
 import { ResultsPanel } from "@/components/ResultsPanel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSearchParams } from "react-router-dom";
 
 export interface MasterProfile {
   contact: {
@@ -64,6 +65,8 @@ const Index = () => {
   const [masterProfile, setMasterProfile] = useState<MasterProfile | null>(null);
   const [results, setResults] = useState<GeneratedResults | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [searchParams] = useSearchParams();
+  const defaultTab = searchParams.get('tab') === 'profile' ? 'profile' : 'generate';
 
   // Load profile on mount
   useEffect(() => {
@@ -110,7 +113,7 @@ const Index = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="generate" className="w-full">
+        <Tabs defaultValue={defaultTab} className="w-full">
           <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
             <TabsTrigger value="generate">Generate</TabsTrigger>
             <TabsTrigger value="profile">Master Profile</TabsTrigger>

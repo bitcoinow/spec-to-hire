@@ -34,7 +34,11 @@ serve(async (req) => {
 
 Your tasks:
 A. Parse RAW_JOB_SPEC to structured JSON (title, company, seniority, location, must_have, nice_to_have, keywords, responsibilities).
-B. Compute a JD–Profile match score (0–1) using exact/semantic keyword hit rate, role/industry overlap, and tool alignment.
+B. Compute a JD–Profile match analysis with:
+   - score (0-1): overall match percentage
+   - keyword_hits: array of keywords from JD found in profile
+   - skill_gaps: array of required skills missing from profile
+   - tool_matches: array of tools/technologies matching between JD and profile
 C. Generate two outputs:
    1) ATS CV in plain text sections (no tables). Include a Requirements Matrix line. Use bullet points with metrics where possible.
    2) 1-page cover letter mirroring JD language (200-300 words).
@@ -48,7 +52,27 @@ Rules:
 - Use simple headings, no tables, left-aligned, 10-11pt equivalent
 - Include exact JD title in Summary line
 
-Return JSON with keys: parsed_job, match, cv_text, cover_letter`;
+CRITICAL: Return JSON with this exact structure:
+{
+  "parsed_job": {
+    "title": "string",
+    "company": "string",
+    "seniority": "string",
+    "location": "string",
+    "must_have": ["string"],
+    "nice_to_have": ["string"],
+    "keywords": ["string"],
+    "responsibilities": ["string"]
+  },
+  "match": {
+    "score": 0.0,
+    "keyword_hits": ["string"],
+    "skill_gaps": ["string"],
+    "tool_matches": ["string"]
+  },
+  "cv_text": "string",
+  "cover_letter": "string"
+}`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
