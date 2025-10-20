@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { JobSpecInput } from "@/components/JobSpecInput";
 import { ProfileEditor } from "@/components/ProfileEditor";
@@ -63,6 +64,37 @@ const Index = () => {
   const [masterProfile, setMasterProfile] = useState<MasterProfile | null>(null);
   const [results, setResults] = useState<GeneratedResults | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // Load profile on mount
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data } = await supabase
+          .from('master_profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        if (data) {
+          const loadedProfile: MasterProfile = {
+            contact: data.contact as any,
+            summary: data.summary,
+            skills: data.skills as any,
+            experience_snippets: data.experience_snippets as any,
+            education: data.education as any,
+            certifications: data.certifications as any,
+          };
+          setMasterProfile(loadedProfile);
+        }
+      } catch (error) {
+        console.error('Error loading profile:', error);
+      }
+    };
+    loadProfile();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">

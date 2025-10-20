@@ -6,6 +6,7 @@ import { FileText, Mail, Download, Copy, TrendingUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { GeneratedResults } from "@/pages/Index";
 import { MatchScore } from "./MatchScore";
+import { MultiCompanySender } from "./MultiCompanySender";
 
 interface ResultsPanelProps {
   results: GeneratedResults | null;
@@ -74,10 +75,11 @@ export const ResultsPanel = ({ results, isGenerating }: ResultsPanelProps) => {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="cv" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="cv">CV</TabsTrigger>
             <TabsTrigger value="cover">Cover Letter</TabsTrigger>
             <TabsTrigger value="analysis">Analysis</TabsTrigger>
+            <TabsTrigger value="send">Send</TabsTrigger>
           </TabsList>
 
           <TabsContent value="cv" className="space-y-4">
@@ -194,6 +196,10 @@ export const ResultsPanel = ({ results, isGenerating }: ResultsPanelProps) => {
                 </div>
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="send" className="space-y-4">
+            <MultiCompanySender cvText={results.cv_text} coverLetter={results.cover_letter} />
           </TabsContent>
         </Tabs>
       </CardContent>
