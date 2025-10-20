@@ -2,10 +2,11 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Save, FileJson, Download } from "lucide-react";
+import { User, Save, FileJson, Download, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import type { MasterProfile } from "@/pages/Index";
+import { Input } from "@/components/ui/input";
 
 interface ProfileEditorProps {
   profile: MasterProfile | null;
@@ -202,11 +203,39 @@ export const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) 
   };
 
   const handleLoadExample = () => {
-    setJsonText(JSON.stringify(defaultProfile, null, 2));
+    const exampleJson = JSON.stringify(defaultProfile, null, 2);
+    setJsonText(exampleJson);
+    onProfileChange(defaultProfile);
     toast({
       title: "Example loaded",
       description: "Edit the example profile to match your information",
     });
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string;
+        // Try to parse as JSON
+        const parsed = JSON.parse(content);
+        setJsonText(JSON.stringify(parsed, null, 2));
+        toast({
+          title: "File loaded",
+          description: "Profile data loaded from file. Click Save to persist.",
+        });
+      } catch (error) {
+        toast({
+          title: "Invalid file",
+          description: "Please upload a valid JSON file",
+          variant: "destructive",
+        });
+      }
+    };
+    reader.readAsText(file);
   };
 
   if (isLoading) {
@@ -254,9 +283,29 @@ export const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) 
               className="flex items-center gap-2 flex-1 sm:flex-none"
             >
               <Download className="w-4 h-4" />
-              <span className="hidden sm:inline">Reload Saved Profile</span>
+              <span className="hidden sm:inline">Reload Saved</span>
               <span className="sm:hidden">Reload</span>
             </Button>
+            <label htmlFor="file-upload" className="flex-1 sm:flex-none">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2 w-full"
+                onClick={() => document.getElementById('file-upload')?.click()}
+              >
+                <Upload className="w-4 h-4" />
+                <span className="hidden sm:inline">Upload JSON</span>
+                <span className="sm:hidden">Upload</span>
+              </Button>
+            </label>
+            <Input
+              id="file-upload"
+              type="file"
+              accept=".json,application/json"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
           </div>
 
           <div className="relative">
