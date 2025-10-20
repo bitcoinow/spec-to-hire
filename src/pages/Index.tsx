@@ -4,8 +4,12 @@ import { Header } from "@/components/Header";
 import { JobSpecInput } from "@/components/JobSpecInput";
 import { ProfileEditor } from "@/components/ProfileEditor";
 import { ResultsPanel } from "@/components/ResultsPanel";
+import { AdSpace } from "@/components/AdSpace";
+import { PricingModal } from "@/components/PricingModal";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSearchParams } from "react-router-dom";
+import { Crown } from "lucide-react";
 
 export interface MasterProfile {
   contact: {
@@ -67,6 +71,8 @@ const Index = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [searchParams] = useSearchParams();
   const defaultTab = searchParams.get('tab') === 'profile' ? 'profile' : 'generate';
+  const [isPro, setIsPro] = useState(false);
+  const [pricingOpen, setPricingOpen] = useState(false);
 
   // Load profile on mount
   useEffect(() => {
@@ -96,12 +102,41 @@ const Index = () => {
         console.error('Error loading profile:', error);
       }
     };
+    
+    const checkSubscription = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('check-subscription');
+        if (!error && data) {
+          setIsPro(data.subscribed || false);
+        }
+      } catch (error) {
+        console.error('Error checking subscription:', error);
+      }
+    };
+    
     loadProfile();
+    checkSubscription();
   }, []);
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      
+      {!isPro && (
+        <div className="bg-gradient-to-r from-primary/10 to-accent/10 border-b">
+          <div className="container mx-auto px-4 py-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm">
+                <span className="font-semibold">Free Plan:</span> 3 generations remaining this month
+              </p>
+              <Button size="sm" onClick={() => setPricingOpen(true)}>
+                <Crown className="w-4 h-4 mr-2" />
+                Upgrade to Pro
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       
       <main className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="mb-8 text-center">
@@ -113,6 +148,10 @@ const Index = () => {
           </p>
         </div>
 
+        {!isPro && (
+          <AdSpace format="horizontal" className="mb-6" slot="top-banner" />
+        )}
+
         <Tabs defaultValue={defaultTab} className="w-full">
           <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
             <TabsTrigger value="generate">Generate</TabsTrigger>
@@ -121,20 +160,29 @@ const Index = () => {
 
           <TabsContent value="generate" className="mt-6">
             <div className="grid lg:grid-cols-2 gap-6">
-              <JobSpecInput
-                jobSpec={jobSpec}
-                onJobSpecChange={setJobSpec}
-                masterProfile={masterProfile}
-                onGenerate={(generatedResults) => {
-                  setResults(generatedResults);
-                  setIsGenerating(false);
-                }}
-                isGenerating={isGenerating}
-                setIsGenerating={setIsGenerating}
-              />
+              <div className="space-y-6">
+                <JobSpecInput
+                  jobSpec={jobSpec}
+                  onJobSpecChange={setJobSpec}
+                  masterProfile={masterProfile}
+                  onGenerate={(generatedResults) => {
+                    setResults(generatedResults);
+                    setIsGenerating(false);
+                  }}
+                  isGenerating={isGenerating}
+                  setIsGenerating={setIsGenerating}
+                />
+                {!isPro && (
+                  <AdSpace format="square" slot="sidebar-1" />
+                )}
+              </div>
               
               <ResultsPanel results={results} isGenerating={isGenerating} />
             </div>
+            
+            {!isPro && (
+              <AdSpace format="horizontal" className="mt-6" slot="bottom-banner" />
+            )}
           </TabsContent>
 
           <TabsContent value="profile" className="mt-6">
@@ -145,6 +193,8 @@ const Index = () => {
           </TabsContent>
         </Tabs>
       </main>
+      
+      <PricingModal open={pricingOpen} onOpenChange={setPricingOpen} />
     </div>
   );
 };

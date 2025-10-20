@@ -24,6 +24,22 @@ export const ResultsPanel = ({ results, isGenerating }: ResultsPanelProps) => {
     });
   };
 
+  const handleDownload = (text: string, filename: string) => {
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast({
+      title: "Downloaded!",
+      description: `${filename} has been downloaded`,
+    });
+  };
+
   if (isGenerating) {
     return (
       <Card className="shadow-lg">
@@ -92,7 +108,11 @@ export const ResultsPanel = ({ results, isGenerating }: ResultsPanelProps) => {
                 <Copy className="w-4 h-4 mr-2" />
                 Copy
               </Button>
-              <Button variant="outline" size="sm">
+              <Button 
+                onClick={() => handleDownload(results.cv_text, `${results.parsed_job.title}_CV.txt`)}
+                variant="outline" 
+                size="sm"
+              >
                 <Download className="w-4 h-4 mr-2" />
                 Download
               </Button>
@@ -115,7 +135,11 @@ export const ResultsPanel = ({ results, isGenerating }: ResultsPanelProps) => {
                 <Copy className="w-4 h-4 mr-2" />
                 Copy
               </Button>
-              <Button variant="outline" size="sm">
+              <Button 
+                onClick={() => handleDownload(results.cover_letter, `${results.parsed_job.title}_CoverLetter.txt`)}
+                variant="outline" 
+                size="sm"
+              >
                 <Download className="w-4 h-4 mr-2" />
                 Download
               </Button>
