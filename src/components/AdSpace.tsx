@@ -14,18 +14,13 @@ export const AdSpace = ({ slot = "demo", format = "horizontal", className = "" }
   };
 
   return (
-    <Card className={`bg-muted/30 border-dashed flex items-center justify-center ${heights[format]} ${className}`}>
-      <div className="text-center text-muted-foreground text-xs space-y-1">
-        <div className="font-semibold">Advertisement Space</div>
-        <div className="text-[10px]">Google AdSense Slot: {slot}</div>
-      </div>
-      {/* Placeholder for Google AdSense - replace with actual AdSense code */}
-      {/* <ins className="adsbygoogle"
-           style={{ display: "block" }}
-           data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+    <Card className={`bg-muted/30 border-dashed overflow-hidden ${heights[format]} ${className}`}>
+      <ins className="adsbygoogle"
+           style={{ display: "block", width: "100%", height: "100%" }}
+           data-ad-client="ca-pub-6863700262799619"
            data-ad-slot={slot}
            data-ad-format="auto"
-           data-full-width-responsive="true"></ins> */}
+           data-full-width-responsive="true"></ins>
     </Card>
   );
 };
