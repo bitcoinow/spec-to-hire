@@ -34,13 +34,12 @@ serve(async (req) => {
       customerId = customers.data[0].id;
     }
 
-    // Note: Replace 'price_xxx' with your actual Stripe price ID once created
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
       line_items: [
         {
-          price: "price_xxx", // Replace with actual price ID from Stripe dashboard
+          price: "price_1SKLaUJyt0pEMwCOVpgmBSbo",
           quantity: 1,
         },
       ],
