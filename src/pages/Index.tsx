@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { JobSpecInput } from "@/components/JobSpecInput";
 import { ProfileEditor } from "@/components/ProfileEditor";
@@ -71,7 +71,7 @@ const Index = () => {
       <main className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="mb-8 text-center">
           <h1 className="text-4xl font-bold mb-3 bg-gradient-primary bg-clip-text text-transparent">
-            Spec2Hire
+            Generate Your Perfect CV
           </h1>
           <p className="text-muted-foreground text-lg">
             Transform job specs into ATS-ready CVs in seconds

@@ -14,7 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      master_profiles: {
+        Row: {
+          certifications: string[] | null
+          contact: Json
+          created_at: string | null
+          education: Json | null
+          experience_snippets: Json
+          id: string
+          skills: Json
+          summary: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          certifications?: string[] | null
+          contact: Json
+          created_at?: string | null
+          education?: Json | null
+          experience_snippets: Json
+          id?: string
+          skills: Json
+          summary: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          certifications?: string[] | null
+          contact?: Json
+          created_at?: string | null
+          education?: Json | null
+          experience_snippets?: Json
+          id?: string
+          skills?: Json
+          summary?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          full_name: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
