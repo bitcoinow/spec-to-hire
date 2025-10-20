@@ -138,12 +138,12 @@ const Index = () => {
         </div>
       )}
       
-      <main className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold mb-3 bg-gradient-primary bg-clip-text text-transparent">
+      <main className="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
+        <div className="mb-6 sm:mb-8 text-center px-4">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 bg-gradient-primary bg-clip-text text-transparent">
             Generate Your Perfect CV
           </h1>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto">
             Transform job specs into ATS-ready CVs in seconds
           </p>
         </div>
@@ -153,14 +153,14 @@ const Index = () => {
         )}
 
         <Tabs defaultValue={defaultTab} className="w-full">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
-            <TabsTrigger value="generate">Generate</TabsTrigger>
-            <TabsTrigger value="profile">Master Profile</TabsTrigger>
+          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 h-11">
+            <TabsTrigger value="generate" className="text-sm sm:text-base">Generate</TabsTrigger>
+            <TabsTrigger value="profile" className="text-sm sm:text-base">Master Profile</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="generate" className="mt-6">
-            <div className="grid lg:grid-cols-2 gap-6">
-              <div className="space-y-6">
+          <TabsContent value="generate" className="mt-6 space-y-6">
+            <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
+              <div className="space-y-4 sm:space-y-6">
                 <JobSpecInput
                   jobSpec={jobSpec}
                   onJobSpecChange={setJobSpec}
@@ -177,7 +177,9 @@ const Index = () => {
                 )}
               </div>
               
-              <ResultsPanel results={results} isGenerating={isGenerating} />
+              <div className="lg:sticky lg:top-6 lg:self-start">
+                <ResultsPanel results={results} isGenerating={isGenerating} />
+              </div>
             </div>
             
             {!isPro && (

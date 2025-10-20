@@ -222,50 +222,56 @@ export const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) 
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="w-5 h-5" />
+    <div className="max-w-4xl mx-auto px-4 sm:px-0">
+      <Card className="shadow-xl border-2">
+        <CardHeader className="space-y-3 pb-6">
+          <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl">
+            <div className="rounded-lg bg-primary/10 p-2">
+              <User className="w-5 h-5 text-primary" />
+            </div>
             Master Profile
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-sm sm:text-base">
             Your single source of truth for all job applications. Edit the JSON below.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex gap-2">
+        <CardContent className="space-y-6">
+          <div className="flex flex-wrap gap-2">
             <Button
               onClick={handleLoadExample}
               variant="outline"
               size="sm"
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 flex-1 sm:flex-none"
             >
               <FileJson className="w-4 h-4" />
-              Load Example
+              <span className="hidden sm:inline">Load Example</span>
+              <span className="sm:hidden">Example</span>
             </Button>
             <Button
               onClick={loadProfile}
               variant="outline"
               size="sm"
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 flex-1 sm:flex-none"
             >
               <Download className="w-4 h-4" />
-              Reload Saved Profile
+              <span className="hidden sm:inline">Reload Saved Profile</span>
+              <span className="sm:hidden">Reload</span>
             </Button>
           </div>
 
-          <Textarea
-            value={jsonText}
-            onChange={(e) => setJsonText(e.target.value)}
-            placeholder="Paste your master profile JSON here..."
-            className="min-h-[500px] font-mono text-sm resize-none"
-          />
+          <div className="relative">
+            <Textarea
+              value={jsonText}
+              onChange={(e) => setJsonText(e.target.value)}
+              placeholder="Paste your master profile JSON here..."
+              className="min-h-[400px] sm:min-h-[500px] font-mono text-xs sm:text-sm resize-none overflow-auto"
+            />
+          </div>
 
           <Button
             onClick={handleSave}
             disabled={isSaving}
-            className="w-full bg-gradient-success hover:opacity-90 transition-opacity"
+            className="w-full bg-gradient-success hover:opacity-90 transition-opacity shadow-lg"
             size="lg"
           >
             {isSaving ? (
@@ -281,17 +287,39 @@ export const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) 
             )}
           </Button>
 
-          <div className="bg-muted/50 p-4 rounded-lg text-sm space-y-2">
-            <p className="font-semibold">Profile Structure:</p>
-            <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-              <li><strong>contact:</strong> Your basic contact information</li>
-              <li><strong>summary:</strong> Professional summary (1-2 lines)</li>
-              <li><strong>skills:</strong> Core skills, domains, and tools</li>
-              <li><strong>experience_snippets:</strong> Reusable achievement bullets with metrics</li>
-              <li><strong>education:</strong> Degrees and institutions</li>
-              <li><strong>certifications:</strong> Professional certifications</li>
-            </ul>
-          </div>
+          <Card className="bg-muted/30 border-2 border-muted">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-semibold">Profile Structure</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2 text-xs sm:text-sm">
+                <li className="flex items-start gap-2">
+                  <span className="font-mono font-semibold text-primary min-w-[120px] sm:min-w-[140px]">contact:</span>
+                  <span className="text-muted-foreground">Your basic contact information</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="font-mono font-semibold text-primary min-w-[120px] sm:min-w-[140px]">summary:</span>
+                  <span className="text-muted-foreground">Professional summary (1-2 lines)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="font-mono font-semibold text-primary min-w-[120px] sm:min-w-[140px]">skills:</span>
+                  <span className="text-muted-foreground">Core skills, domains, and tools</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="font-mono font-semibold text-primary min-w-[120px] sm:min-w-[140px]">experience:</span>
+                  <span className="text-muted-foreground">Reusable achievement bullets</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="font-mono font-semibold text-primary min-w-[120px] sm:min-w-[140px]">education:</span>
+                  <span className="text-muted-foreground">Degrees and institutions</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="font-mono font-semibold text-primary min-w-[120px] sm:min-w-[140px]">certifications:</span>
+                  <span className="text-muted-foreground">Professional certifications</span>
+                </li>
+              </ul>
+            </CardContent>
+          </Card>
         </CardContent>
       </Card>
     </div>
