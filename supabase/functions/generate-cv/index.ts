@@ -19,7 +19,7 @@ serve(async (req) => {
   try {
     console.log('Starting request processing...');
     
-    // Authenticate user
+    // Authenticate user with service role
     const authHeader = req.headers.get('Authorization');
     console.log('Auth header present:', !!authHeader);
     
@@ -30,18 +30,23 @@ serve(async (req) => {
       );
     }
 
-    const supabase = createClient(
+    // Create admin client to verify user
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: authHeader } } }
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    // Get JWT token from Authorization header
+    const jwt = authHeader.replace('Bearer ', '');
+    
+    // Verify the JWT token
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(jwt);
     console.log('User auth result:', { userId: user?.id, hasError: !!authError });
     
     if (authError || !user) {
+      console.error('Auth error details:', authError);
       return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
+        JSON.stringify({ error: 'Unauthorized', details: authError?.message }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
