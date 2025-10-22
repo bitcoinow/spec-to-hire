@@ -15,51 +15,51 @@ interface ProfileEditorProps {
 
 const defaultProfile: MasterProfile = {
   contact: {
-    full_name: "Prince Aigbomian",
-    city_country: "London, UK",
-    phone: "+44...",
-    email: "aigpoj@gmail.com",
-    links: ["https://linkedin.com/in/...", "https://github.com/..."],
+    full_name: "Your Full Name",
+    city_country: "Your City, Country",
+    phone: "+1234567890",
+    email: "your.email@example.com",
+    links: ["https://linkedin.com/in/yourprofile", "https://github.com/yourusername"],
   },
-  summary: "QA & Delivery Ops specialist with X years in retail last-mile...",
+  summary: "Experienced professional with X years in [your industry]. Specialized in [key skills] and passionate about [your focus areas].",
   skills: {
-    core: ["QA", "SDET", "API testing", "Playwright", "JMeter", "Azure DevOps"],
-    domains: ["Retail Ops", "Logistics", "Customer Service"],
-    tools: ["Jira", "Confluence", "SQL", "Postman", "Git", "Python"],
+    core: ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5"],
+    domains: ["Domain 1", "Domain 2", "Domain 3"],
+    tools: ["Tool 1", "Tool 2", "Tool 3", "Tool 4"],
   },
   experience_snippets: [
     {
-      id: "asda_delivery_ops",
-      role: "Delivery Operations Associate",
-      company: "ASDA",
-      dates: "2023–Present",
+      id: "job_1",
+      role: "Your Job Title",
+      company: "Company Name",
+      dates: "YYYY–Present",
       bullets: [
-        "Optimised delivery slot allocation, reducing late drops by 18% in 90 days.",
-        "Managed route exceptions and customer escalations, improving CSAT from 4.2→4.6.",
-        "Built QA playbooks for mini-projects (slot changes, pick-pack flow, substitutions).",
+        "Achievement 1 with quantifiable results (e.g., increased X by Y%).",
+        "Achievement 2 demonstrating leadership or initiative.",
+        "Achievement 3 showing technical expertise or problem-solving.",
       ],
-      tags: ["delivery", "logistics", "customer service", "retail", "QA", "leadership"],
+      tags: ["tag1", "tag2", "tag3", "tag4"],
     },
     {
-      id: "qa_test_analyst",
-      role: "QA/Test Analyst",
-      company: "Freelance/Projects",
-      dates: "2022–2023",
+      id: "job_2",
+      role: "Previous Job Title",
+      company: "Previous Company",
+      dates: "YYYY–YYYY",
       bullets: [
-        "Created Playwright E2E suites (CI via GitHub Actions) cutting regression time by 70%.",
-        "Led JMeter load tests (ramp-up, listeners, assertions) for BlazeDemo clone; 0 Sev-1s post-release.",
+        "Key responsibility or achievement 1.",
+        "Key responsibility or achievement 2.",
       ],
-      tags: ["qa", "automation", "jmeter", "playwright", "devops"],
+      tags: ["tag1", "tag2", "tag3"],
     },
   ],
   education: [
     {
-      degree: "MSc MBIT",
+      degree: "Your Degree",
       school: "University Name",
-      year: "2025",
+      year: "YYYY",
     },
   ],
-  certifications: ["Google Cybersecurity (in progress)"],
+  certifications: ["Certification 1", "Certification 2"],
 };
 
 export const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) => {
