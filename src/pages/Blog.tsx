@@ -83,10 +83,10 @@ const Blog = () => {
                   href={selectedPost.job_site_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-primary hover:underline flex items-center gap-2"
+                  className="text-primary hover:underline flex items-center gap-2 break-all"
                 >
-                  {selectedPost.job_site_url}
-                  <ExternalLink className="w-4 h-4" />
+                  <span className="break-all">{selectedPost.job_site_url}</span>
+                  <ExternalLink className="w-4 h-4 flex-shrink-0" />
                 </a>
               </div>
             )}

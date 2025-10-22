@@ -22,21 +22,21 @@ const Landing = () => {
             </div>
           </div>
           
-          <div className="flex items-center gap-4">
-            <Link to="/faq">
+          <div className="flex items-center gap-2 md:gap-4">
+            <Link to="/faq" className="hidden md:block">
               <Button variant="ghost">FAQ</Button>
             </Link>
-            <Link to="/how-to-use">
+            <Link to="/how-to-use" className="hidden md:block">
               <Button variant="ghost">How to Use</Button>
             </Link>
-            <Link to="/blog">
+            <Link to="/blog" className="hidden sm:block">
               <Button variant="ghost">Blog</Button>
             </Link>
-            <Link to="/auth">
-              <Button variant="outline">Sign In</Button>
+            <Link to="/auth" className="hidden sm:block">
+              <Button variant="outline" size="sm">Sign In</Button>
             </Link>
             <Link to="/auth?mode=signup">
-              <Button className="bg-gradient-primary">Get Started</Button>
+              <Button className="bg-gradient-primary" size="sm">Get Started</Button>
             </Link>
           </div>
         </div>
@@ -95,8 +95,8 @@ const Landing = () => {
 
           <Card className="shadow-lg border-2 hover:border-primary transition-colors bg-card">
             <CardHeader>
-              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-success to-success flex items-center justify-center mb-4">
-                <Sparkles className="w-6 h-6 text-success-foreground" />
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary to-foreground flex items-center justify-center mb-4">
+                <Sparkles className="w-6 h-6 text-primary-foreground" />
               </div>
               <CardTitle className="text-card-foreground">AI-Powered Matching</CardTitle>
               <CardDescription className="text-card-foreground/80">
