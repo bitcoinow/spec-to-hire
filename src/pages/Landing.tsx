@@ -29,6 +29,9 @@ const Landing = () => {
             <Link to="/how-to-use">
               <Button variant="ghost">How to Use</Button>
             </Link>
+            <Link to="/blog">
+              <Button variant="ghost">Blog</Button>
+            </Link>
             <Link to="/auth">
               <Button variant="outline">Sign In</Button>
             </Link>
@@ -66,37 +69,37 @@ const Landing = () => {
 
         {/* Features Grid */}
         <div className="grid md:grid-cols-3 gap-6 mb-20">
-          <Card className="shadow-lg border-2 hover:border-primary transition-colors">
+          <Card className="shadow-lg border-2 hover:border-primary transition-colors bg-card">
             <CardHeader>
-              <div className="w-12 h-12 rounded-lg bg-gradient-primary flex items-center justify-center mb-4">
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary to-foreground flex items-center justify-center mb-4">
                 <Zap className="w-6 h-6 text-primary-foreground" />
               </div>
-              <CardTitle>Lightning Fast</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-card-foreground">Lightning Fast</CardTitle>
+              <CardDescription className="text-card-foreground/80">
                 Generate tailored CVs in under 30 seconds. No more hours of manual editing.
               </CardDescription>
             </CardHeader>
           </Card>
 
-          <Card className="shadow-lg border-2 hover:border-primary transition-colors">
+          <Card className="shadow-lg border-2 hover:border-primary transition-colors bg-card">
             <CardHeader>
-              <div className="w-12 h-12 rounded-lg bg-gradient-primary flex items-center justify-center mb-4">
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary to-foreground flex items-center justify-center mb-4">
                 <Shield className="w-6 h-6 text-primary-foreground" />
               </div>
-              <CardTitle>ATS-Optimized</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-card-foreground">ATS-Optimized</CardTitle>
+              <CardDescription className="text-card-foreground/80">
                 Built to pass Applicant Tracking Systems with keyword optimization and proper formatting.
               </CardDescription>
             </CardHeader>
           </Card>
 
-          <Card className="shadow-lg border-2 hover:border-primary transition-colors">
+          <Card className="shadow-lg border-2 hover:border-primary transition-colors bg-card">
             <CardHeader>
-              <div className="w-12 h-12 rounded-lg bg-gradient-success flex items-center justify-center mb-4">
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-success to-success flex items-center justify-center mb-4">
                 <Sparkles className="w-6 h-6 text-success-foreground" />
               </div>
-              <CardTitle>AI-Powered Matching</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-card-foreground">AI-Powered Matching</CardTitle>
+              <CardDescription className="text-card-foreground/80">
                 Smart algorithms match your experience with job requirements for maximum relevance.
               </CardDescription>
             </CardHeader>
@@ -105,7 +108,7 @@ const Landing = () => {
 
         {/* How It Works */}
         <div className="mb-20">
-          <h2 className="text-4xl font-bold text-center mb-12">How It Works</h2>
+          <h2 className="text-4xl font-bold text-center mb-12 text-foreground">How It Works</h2>
           
           <div className="grid md:grid-cols-4 gap-8">
             {[
@@ -115,10 +118,10 @@ const Landing = () => {
               { step: "4", title: "Download & Apply", desc: "Get your CV and cover letter ready to send" },
             ].map((item, i) => (
               <div key={i} className="text-center">
-                <div className="w-16 h-16 rounded-full bg-gradient-primary text-primary-foreground text-2xl font-bold flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-foreground text-primary-foreground text-2xl font-bold flex items-center justify-center mx-auto mb-4 shadow-lg">
                   {item.step}
                 </div>
-                <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
+                <h3 className="font-semibold text-lg mb-2 text-foreground">{item.title}</h3>
                 <p className="text-muted-foreground text-sm">{item.desc}</p>
               </div>
             ))}
@@ -126,9 +129,9 @@ const Landing = () => {
         </div>
 
         {/* Benefits */}
-        <Card className="shadow-xl bg-gradient-card border-2">
+        <Card className="shadow-xl bg-gradient-to-br from-card to-muted border-2">
           <CardContent className="p-12">
-            <h2 className="text-3xl font-bold text-center mb-8">Why Choose Spec2Hire?</h2>
+            <h2 className="text-3xl font-bold text-center mb-8 text-card-foreground">Why Choose Spec2Hire?</h2>
             
             <div className="grid md:grid-cols-2 gap-6">
               {[
@@ -141,7 +144,7 @@ const Landing = () => {
               ].map((benefit, i) => (
                 <div key={i} className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0 mt-1" />
-                  <p className="text-foreground">{benefit}</p>
+                  <p className="text-card-foreground">{benefit}</p>
                 </div>
               ))}
             </div>

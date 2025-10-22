@@ -6,3 +6,5 @@ verify_jwt = false
 [functions.create-checkout]
 
 [functions.check-subscription]
+
+[functions.generate-blog]

@@ -11,6 +11,8 @@ import HowToUse from "./pages/HowToUse";
 import Index from "./pages/Index";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import Blog from "./pages/Blog";
+import BlogAdmin from "./pages/BlogAdmin";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -27,6 +29,15 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/how-to-use" element={<HowToUse />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route
+            path="/blog-admin"
+            element={
+              <ProtectedRoute>
+                <BlogAdmin />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/app"
             element={
