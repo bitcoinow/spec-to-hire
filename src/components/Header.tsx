@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { User } from "@supabase/supabase-js";
 import logo from "@/assets/spec2hire-logo.png";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -73,8 +74,11 @@ export const Header = () => {
           </div>
         </div>
 
-        {user && (
-          <DropdownMenu>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          
+          {user && (
+            <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="flex items-center gap-2">
                 <UserIcon className="h-4 w-4" />
@@ -99,7 +103,8 @@ export const Header = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        )}
+          )}
+        </div>
       </div>
     </header>
   );
