@@ -7,13 +7,22 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  console.log('=== GENERATE-CV REQUEST RECEIVED ===');
+  console.log('Method:', req.method);
+  console.log('URL:', req.url);
+  
   if (req.method === 'OPTIONS') {
+    console.log('Handling OPTIONS request');
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    console.log('Starting request processing...');
+    
     // Authenticate user
     const authHeader = req.headers.get('Authorization');
+    console.log('Auth header present:', !!authHeader);
+    
     if (!authHeader) {
       return new Response(
         JSON.stringify({ error: 'Authentication required' }),
@@ -28,6 +37,8 @@ serve(async (req) => {
     );
 
     const { data: { user }, error: authError } = await supabase.auth.getUser();
+    console.log('User auth result:', { userId: user?.id, hasError: !!authError });
+    
     if (authError || !user) {
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
@@ -35,7 +46,10 @@ serve(async (req) => {
       );
     }
 
+    console.log('Parsing request body...');
     const requestData = await req.json();
+    console.log('Request data keys:', Object.keys(requestData));
+    
     const { jobSpec, masterProfile } = requestData;
     
     // Input validation
@@ -223,7 +237,12 @@ CRITICAL: Return JSON with this exact structure:
     );
 
   } catch (error) {
-    console.error('Error in generate-cv function:', error);
+    console.error('=== ERROR IN GENERATE-CV ===');
+    console.error('Error type:', error?.constructor?.name);
+    console.error('Error message:', error instanceof Error ? error.message : String(error));
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack');
+    console.error('Full error:', error);
+    
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({ error: errorMessage }),
