@@ -12,7 +12,56 @@ serve(async (req) => {
   }
 
   try {
-    const { topic, category, jobSiteUrl } = await req.json();
+    const requestData = await req.json();
+    const { topic, category, jobSiteUrl } = requestData;
+    
+    // Input validation
+    if (!topic || typeof topic !== 'string') {
+      return new Response(
+        JSON.stringify({ error: 'Invalid topic: must be a non-empty string' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    if (topic.length < 5 || topic.length > 500) {
+      return new Response(
+        JSON.stringify({ error: 'Topic must be between 5 and 500 characters' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    const validCategories = ['job_news', 'hiring_tips', 'industry_trends', 'company_spotlight'];
+    if (!category || !validCategories.includes(category)) {
+      return new Response(
+        JSON.stringify({ error: `Invalid category: must be one of ${validCategories.join(', ')}` }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // Validate jobSiteUrl if provided
+    if (jobSiteUrl) {
+      if (typeof jobSiteUrl !== 'string' || jobSiteUrl.length > 2000) {
+        return new Response(
+          JSON.stringify({ error: 'Job site URL must be a string with max 2000 characters' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      try {
+        const url = new URL(jobSiteUrl);
+        if (!['http:', 'https:'].includes(url.protocol)) {
+          return new Response(
+            JSON.stringify({ error: 'Job site URL must use HTTP or HTTPS protocol' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+      } catch {
+        return new Response(
+          JSON.stringify({ error: 'Invalid job site URL format' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     
     if (!LOVABLE_API_KEY) {

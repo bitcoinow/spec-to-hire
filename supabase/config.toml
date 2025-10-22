@@ -1,7 +1,6 @@
 project_id = "mggtjhyvmfjlcxjauqvt"
 
 [functions.generate-cv]
-verify_jwt = false
 
 [functions.create-checkout]
 
