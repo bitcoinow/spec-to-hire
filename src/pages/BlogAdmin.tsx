@@ -14,7 +14,8 @@ import { Switch } from "@/components/ui/switch";
 
 const BlogAdmin = () => {
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [topic, setTopic] = useState("");
   const [category, setCategory] = useState("job_news");
   const [jobSiteUrl, setJobSiteUrl] = useState("");
@@ -32,8 +33,30 @@ const BlogAdmin = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       navigate("/auth");
+      return;
     }
     setUser(user);
+    
+    // Check if user has admin role
+    const { data: roles, error } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
+      .single();
+    
+    if (error || !roles) {
+      toast({
+        title: "Access Denied",
+        description: "You don't have permission to access the blog admin. Only administrators can manage blog posts.",
+        variant: "destructive",
+      });
+      navigate("/");
+      return;
+    }
+    
+    setIsAdmin(true);
+    setLoading(false);
   };
 
   const loadBlogPosts = async () => {
@@ -164,6 +187,14 @@ const BlogAdmin = () => {
       });
     }
   };
+
+  if (loading || !isAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
