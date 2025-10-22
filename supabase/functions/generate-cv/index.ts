@@ -73,6 +73,8 @@ serve(async (req) => {
     }
 
     console.log('Processing CV generation request...');
+    console.log('Job spec length:', jobSpec.length);
+    console.log('Master profile keys:', Object.keys(masterProfile));
 
     // System prompt for the AI
     const systemPrompt = `You are an ATS-savvy career writer. Given:
@@ -121,6 +123,8 @@ CRITICAL: Return JSON with this exact structure:
   "cover_letter": "string"
 }`;
 
+    console.log('Calling Lovable AI Gateway...');
+    
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -140,6 +144,8 @@ CRITICAL: Return JSON with this exact structure:
         max_tokens: 4000,
       }),
     });
+
+    console.log('AI Gateway response status:', response.status);
 
     if (!response.ok) {
       if (response.status === 429) {
@@ -164,11 +170,16 @@ CRITICAL: Return JSON with this exact structure:
     }
 
     const data = await response.json();
+    console.log('AI response received, has choices:', !!data.choices);
+    
     const content = data.choices?.[0]?.message?.content;
 
     if (!content) {
+      console.error('No content in AI response. Data:', JSON.stringify(data));
       throw new Error('No content in AI response');
     }
+
+    console.log('Content length:', content.length);
 
     // Parse the AI response - it should be JSON
     let result;
@@ -182,6 +193,7 @@ CRITICAL: Return JSON with this exact structure:
       }
     } catch (parseError) {
       console.error('Failed to parse AI response:', parseError);
+      console.error('Content that failed to parse:', content.substring(0, 500));
       // If parsing fails, create a structured response from the text
       result = {
         parsed_job: {
