@@ -51,9 +51,9 @@ const Landing = () => {
             Transform Job Specs into Perfect CVs in Seconds
           </h1>
           
-          <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
+          <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance mb-8 text-muted-foreground">
             Stop spending hours tailoring your CV for each application. Spec2Hire uses advanced AI to parse job descriptions and generate ATS-optimized CVs and cover letters that get you noticed.
-          </p>
+          </h1>
           
           <div className="flex items-center justify-center gap-4">
             <Link to="/auth?mode=signup">
