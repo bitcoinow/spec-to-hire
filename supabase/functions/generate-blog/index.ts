@@ -88,13 +88,21 @@ serve(async (req) => {
 
     const systemPrompt = `You are a professional content writer specializing in job market news and career advice. 
 Generate engaging, informative blog posts about ${category || 'job market news'}.
-Format the response as JSON with the following structure:
+
+CRITICAL: You must return ONLY valid JSON with this exact structure:
 {
   "title": "Compelling blog post title (max 100 characters)",
   "excerpt": "Brief summary for preview (max 200 characters)",
   "content": "Full blog post content in markdown format (500-800 words)",
   "tags": ["tag1", "tag2", "tag3"]
-}`;
+}
+
+IMPORTANT JSON FORMATTING RULES:
+- All string values must have properly escaped quotes (use \\" for quotes inside strings)
+- Content should use markdown but ensure all quotes are properly escaped
+- Do not include any text before or after the JSON object
+- Do not wrap the JSON in markdown code blocks
+- Ensure all JSON is valid and parseable`;
 
     const userPrompt = `Write a blog post about: ${topic}${jobSiteUrl ? `\n\nInclude information relevant to job seekers using ${jobSiteUrl}` : ''}`;
 
@@ -133,8 +141,48 @@ Format the response as JSON with the following structure:
     }
 
     const data = await response.json();
-    const content = data.choices[0].message.content;
-    const blogData = JSON.parse(content);
+    let content = data.choices[0].message.content;
+    
+    console.log('Raw AI response length:', content.length);
+    console.log('First 200 chars:', content.substring(0, 200));
+    
+    // Try to extract JSON from markdown code blocks if present
+    const jsonBlockMatch = content.match(/```(?:json)?\s*(\{[\s\S]*\})\s*```/);
+    if (jsonBlockMatch) {
+      console.log('Extracted JSON from code block');
+      content = jsonBlockMatch[1];
+    }
+    
+    // Try to find JSON object in the content
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      content = jsonMatch[0];
+    }
+    
+    let blogData;
+    try {
+      blogData = JSON.parse(content);
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError);
+      console.error('Content that failed to parse (first 500 chars):', content.substring(0, 500));
+      
+      // Try to fix common JSON issues
+      let fixedContent = content
+        .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Remove control characters
+        .replace(/,(\s*[}\]])/g, '$1') // Remove trailing commas
+        .replace(/\n/g, '\\n') // Escape newlines
+        .replace(/\r/g, '\\r') // Escape carriage returns
+        .replace(/\t/g, '\\t'); // Escape tabs
+      
+      try {
+        blogData = JSON.parse(fixedContent);
+        console.log('Successfully parsed after fixes');
+      } catch (secondError) {
+        console.error('Still failed after fixes:', secondError);
+        const errorMsg = parseError instanceof Error ? parseError.message : 'Unknown parse error';
+        throw new Error(`Failed to parse AI response as JSON: ${errorMsg}`);
+      }
+    }
 
     // Generate slug from title
     const slug = blogData.title
