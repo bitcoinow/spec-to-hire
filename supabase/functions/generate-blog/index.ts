@@ -131,46 +131,53 @@ CRITICAL SEO & STRUCTURE REQUIREMENTS:
 
 8. WORD COUNT: 800-1200 words total
 
-CRITICAL JSON FORMAT:
-Return ONLY valid JSON with this exact structure:
+CRITICAL: Return ONLY a valid JSON object. Do NOT include any text before or after the JSON.
+Do NOT wrap the JSON in markdown code blocks.
+
+Required JSON structure:
 {
   "title": "SEO-optimized title (max 60 chars)",
-  "metaTitle": "Meta title for SEO (max 60 chars)",
+  "metaTitle": "Meta title for SEO (max 60 chars)",  
   "metaDescription": "Compelling meta description with CTA (150-155 chars)",
   "focusKeyword": "main keyword phrase",
   "secondaryKeywords": ["keyword1", "keyword2", "keyword3"],
   "excerpt": "Brief summary (max 200 characters)",
   "content": "Full markdown content following all structure rules above",
   "tags": ["tag1", "tag2", "tag3"]
-}
-
-JSON FORMATTING RULES:
-- Properly escape ALL quotes in strings (use \\\\" for quotes inside strings)
-- Properly escape newlines in markdown content (use \\\\n)
-- Do NOT include text before or after the JSON object
-- Do NOT wrap JSON in markdown code blocks
-- Ensure all JSON is valid and parseable
-- Test that all quotes and special characters are properly escaped`;
+}`;
 
     const userPrompt = `Write a blog post about: ${topic}${jobSiteUrl ? `\n\nInclude information relevant to job seekers using ${jobSiteUrl}` : ''}`;
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
-        ],
-        response_format: { type: "json_object" }
-      }),
-    });
+    let response;
+    try {
+      response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt }
+          ],
+          response_format: { type: "json_object" },
+          temperature: 0.7
+        }),
+      });
+    } catch (fetchError) {
+      console.error('Fetch error:', fetchError);
+      return new Response(
+        JSON.stringify({ error: 'Failed to connect to AI service' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('AI gateway error:', response.status, errorText);
+      
       if (response.status === 429) {
         return new Response(
           JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }),
@@ -183,12 +190,32 @@ JSON FORMATTING RULES:
           { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-      const errorText = await response.text();
-      console.error('AI gateway error:', response.status, errorText);
-      throw new Error('AI generation failed');
+      
+      return new Response(
+        JSON.stringify({ error: `AI generation failed: ${errorText.substring(0, 200)}` }),
+        { status: response.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    const data = await response.json();
+    let data;
+    try {
+      data = await response.json();
+    } catch (jsonError) {
+      console.error('Failed to parse response as JSON:', jsonError);
+      return new Response(
+        JSON.stringify({ error: 'Invalid response from AI service' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error('Unexpected AI response structure:', JSON.stringify(data));
+      return new Response(
+        JSON.stringify({ error: 'Unexpected response format from AI service' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     let content = data.choices[0].message.content;
     
     console.log('Raw AI response length:', content.length);
@@ -210,26 +237,40 @@ JSON FORMATTING RULES:
     let blogData;
     try {
       blogData = JSON.parse(content);
+      console.log('Successfully parsed JSON on first attempt');
     } catch (parseError) {
       console.error('JSON parse error:', parseError);
-      console.error('Content that failed to parse (first 500 chars):', content.substring(0, 500));
+      console.error('Content that failed to parse:', content.substring(0, 1000));
       
       // Try to fix common JSON issues
-      let fixedContent = content
-        .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Remove control characters
-        .replace(/,(\s*[}\]])/g, '$1') // Remove trailing commas
-        .replace(/\n/g, '\\n') // Escape newlines
-        .replace(/\r/g, '\\r') // Escape carriage returns
-        .replace(/\t/g, '\\t'); // Escape tabs
-      
       try {
+        let fixedContent = content
+          .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Remove control characters
+          .replace(/,(\s*[}\]])/g, '$1') // Remove trailing commas
+          .trim();
+        
         blogData = JSON.parse(fixedContent);
         console.log('Successfully parsed after fixes');
       } catch (secondError) {
         console.error('Still failed after fixes:', secondError);
         const errorMsg = parseError instanceof Error ? parseError.message : 'Unknown parse error';
-        throw new Error(`Failed to parse AI response as JSON: ${errorMsg}`);
+        return new Response(
+          JSON.stringify({ 
+            error: `Failed to parse AI response: ${errorMsg}`,
+            details: content.substring(0, 500)
+          }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
       }
+    }
+
+    // Validate required fields
+    if (!blogData.title || !blogData.content) {
+      console.error('Missing required fields in blog data:', Object.keys(blogData));
+      return new Response(
+        JSON.stringify({ error: 'AI response missing required fields (title or content)' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Generate slug from title
