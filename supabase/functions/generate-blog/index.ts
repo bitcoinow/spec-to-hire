@@ -86,23 +86,71 @@ serve(async (req) => {
 
     console.log('Generating blog post for topic:', topic);
 
-    const systemPrompt = `You are a professional content writer specializing in job market news and career advice. 
-Generate engaging, informative blog posts about ${category || 'job market news'}.
+    const systemPrompt = `You are an expert SEO content writer specializing in job market news and career advice.
 
-CRITICAL: You must return ONLY valid JSON with this exact structure:
+CRITICAL SEO & STRUCTURE REQUIREMENTS:
+
+1. TITLE (H1):
+   - Maximum 60 characters for SEO
+   - Include focus keyword naturally
+   - Make it compelling and click-worthy
+
+2. META INFORMATION:
+   - Meta Description: Exactly 150-155 characters, include CTA
+   - Focus Keyword: Main keyword for the article
+   - Secondary Keywords: 2-3 related terms
+
+3. OPENING HOOK (2 short paragraphs):
+   - First paragraph: Engaging question or statement (2-3 sentences)
+   - Second paragraph: Clear value proposition or bottom line (1-2 sentences)
+
+4. CONTENT STRUCTURE (H2/H3 Hierarchy):
+   - Use ## for main sections (H2)
+   - Use ### for subsections (H3)
+   - Each section: 2-4 short paragraphs max
+   - Paragraphs: 2-4 sentences each (never more than 5)
+
+5. FORMATTING FOR SCANNABILITY:
+   - Use bullet points for lists
+   - Use **bold text** for key terms and emphasis
+   - Include "Before/After" examples where relevant
+   - Add plenty of white space between sections
+
+6. REQUIRED SECTIONS:
+   - Strong introduction with hook
+   - 3-5 main content sections with H2 headings
+   - FAQ section (3-5 questions) for featured snippets
+   - Clear conclusion with actionable CTA
+
+7. SEO BEST PRACTICES:
+   - Naturally integrate focus keyword 3-5 times
+   - Use secondary keywords throughout
+   - Include internal linking suggestions (mention relevant topics)
+   - Write descriptive, keyword-rich subheadings
+   - Maintain conversational, engaging tone
+
+8. WORD COUNT: 800-1200 words total
+
+CRITICAL JSON FORMAT:
+Return ONLY valid JSON with this exact structure:
 {
-  "title": "Compelling blog post title (max 100 characters)",
-  "excerpt": "Brief summary for preview (max 200 characters)",
-  "content": "Full blog post content in markdown format (500-800 words)",
+  "title": "SEO-optimized title (max 60 chars)",
+  "metaTitle": "Meta title for SEO (max 60 chars)",
+  "metaDescription": "Compelling meta description with CTA (150-155 chars)",
+  "focusKeyword": "main keyword phrase",
+  "secondaryKeywords": ["keyword1", "keyword2", "keyword3"],
+  "excerpt": "Brief summary (max 200 characters)",
+  "content": "Full markdown content following all structure rules above",
   "tags": ["tag1", "tag2", "tag3"]
 }
 
-IMPORTANT JSON FORMATTING RULES:
-- All string values must have properly escaped quotes (use \\" for quotes inside strings)
-- Content should use markdown but ensure all quotes are properly escaped
-- Do not include any text before or after the JSON object
-- Do not wrap the JSON in markdown code blocks
-- Ensure all JSON is valid and parseable`;
+JSON FORMATTING RULES:
+- Properly escape ALL quotes in strings (use \\\\" for quotes inside strings)
+- Properly escape newlines in markdown content (use \\\\n)
+- Do NOT include text before or after the JSON object
+- Do NOT wrap JSON in markdown code blocks
+- Ensure all JSON is valid and parseable
+- Test that all quotes and special characters are properly escaped`;
 
     const userPrompt = `Write a blog post about: ${topic}${jobSiteUrl ? `\n\nInclude information relevant to job seekers using ${jobSiteUrl}` : ''}`;
 
@@ -194,6 +242,10 @@ IMPORTANT JSON FORMATTING RULES:
       JSON.stringify({
         title: blogData.title,
         slug,
+        metaTitle: blogData.metaTitle || blogData.title,
+        metaDescription: blogData.metaDescription || blogData.excerpt,
+        focusKeyword: blogData.focusKeyword || '',
+        secondaryKeywords: blogData.secondaryKeywords || [],
         excerpt: blogData.excerpt,
         content: blogData.content,
         tags: blogData.tags || [],
