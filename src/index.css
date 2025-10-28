@@ -86,8 +86,15 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "kern";
   }
   
   /* Smooth scrolling */
