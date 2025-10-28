@@ -68,15 +68,18 @@ const Landing = () => {
           </Link>
           
           <div className="flex items-center gap-4">
-            <button onClick={scrollToDemo} className="hidden md:block text-foreground hover:text-primary transition-colors">
+            <button onClick={scrollToDemo} className="hidden md:block text-sm text-foreground hover:text-primary transition-colors">
               How it works
             </button>
-            <Link to="/blog" className="hidden md:block text-foreground hover:text-primary transition-colors">
+            <Link to="/pricing" className="hidden md:block text-sm text-foreground hover:text-primary transition-colors">
               Pricing
+            </Link>
+            <Link to="/blog" className="hidden md:block text-sm text-foreground hover:text-primary transition-colors">
+              Blog
             </Link>
             <button 
               onClick={scrollToWaitlist}
-              className="inline-flex items-center rounded-lg border border-primary bg-primary text-primary-foreground px-3 py-1.5 font-medium hover:opacity-90 transition-opacity"
+              className="inline-flex items-center rounded-lg border border-primary bg-primary text-primary-foreground px-3 py-1.5 text-sm font-medium hover:opacity-90 transition-opacity"
             >
               Generate my CV
             </button>
@@ -90,10 +93,10 @@ const Landing = () => {
           <div className="container mx-auto px-4 py-16 max-w-6xl">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div>
-                <h1 id="hero-heading" className="text-4xl md:text-5xl font-bold leading-tight">
-                  Turn any job spec into an ATS-friendly CV & cover letter in <span className="underline decoration-2 decoration-primary">60 seconds</span>.
+                <h1 id="hero-heading" className="text-4xl md:text-5xl font-bold tracking-tight leading-[1.1]">
+                  Turn any job spec into an ATS-friendly CV & cover letter in <span className="font-display">60 seconds</span>.
                 </h1>
-                <p className="mt-4 text-lg text-muted-foreground">
+                <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
                   Paste the job description. We tailor your CV to the role, optimize for ATS, and draft a matching cover letter.
                 </p>
                 <div className="mt-6 flex gap-3">
@@ -128,7 +131,7 @@ const Landing = () => {
 
         {/* How It Works */}
         <section className="container mx-auto px-4 py-12 max-w-6xl" aria-labelledby="how-it-works-heading">
-          <h2 id="how-it-works-heading" className="text-2xl font-bold mb-6">How it works</h2>
+          <h2 id="how-it-works-heading" className="text-2xl font-semibold tracking-tight mb-6">How it works</h2>
           
           <div className="grid md:grid-cols-3 gap-6">
             {[
@@ -139,8 +142,8 @@ const Landing = () => {
               <Card key={title} className="rounded-xl border bg-card shadow-sm hover:shadow-md transition-shadow">
                 <CardContent className="p-5">
                   <Icon className="w-8 h-8 text-primary mb-3" aria-hidden="true" />
-                  <h3 className="font-semibold text-card-foreground mb-2">{title}</h3>
-                  <p className="text-muted-foreground">{desc}</p>
+                  <h3 className="text-lg font-semibold mb-2">{title}</h3>
+                  <p className="text-[15px] text-muted-foreground leading-relaxed">{desc}</p>
                 </CardContent>
               </Card>
             ))}
@@ -151,7 +154,7 @@ const Landing = () => {
         {/* Benefits */}
         <Card className="shadow-xl bg-gradient-to-br from-card to-muted border-2">
           <CardContent className="p-12">
-            <h2 className="text-3xl font-bold text-center mb-8 text-card-foreground">Why Choose Spec2Hire?</h2>
+            <h2 className="text-3xl font-bold tracking-tight text-center mb-8 text-card-foreground">Why Choose Spec2Hire?</h2>
             
             <div className="grid md:grid-cols-2 gap-6">
               {[
@@ -164,7 +167,7 @@ const Landing = () => {
               ].map((benefit, i) => (
                 <div key={i} className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0 mt-1" />
-                  <p className="text-card-foreground">{benefit}</p>
+                  <p className="text-[15px] leading-relaxed text-card-foreground">{benefit}</p>
                 </div>
               ))}
             </div>
@@ -173,7 +176,7 @@ const Landing = () => {
 
           {/* Testimonials */}
           <section className="mb-20" aria-labelledby="testimonials-heading">
-            <h2 id="testimonials-heading" className="text-4xl font-bold text-center mb-12 text-foreground">What Our Users Say</h2>
+            <h2 id="testimonials-heading" className="text-4xl font-bold tracking-tight text-center mb-12 text-foreground">What Our Users Say</h2>
             
             <div className="grid md:grid-cols-3 gap-6">
               {[
@@ -183,7 +186,7 @@ const Landing = () => {
               ].map((testimonial, i) => (
                 <Card key={i} className="shadow-lg bg-card">
                   <CardContent className="pt-6">
-                    <p className="text-card-foreground mb-4 italic">"{testimonial.text}"</p>
+                    <p className="text-[15px] leading-relaxed text-card-foreground mb-4 italic">"{testimonial.text}"</p>
                     <div>
                       <p className="font-semibold text-card-foreground">{testimonial.name}</p>
                       <p className="text-sm text-muted-foreground">{testimonial.role}</p>
@@ -210,7 +213,7 @@ const Landing = () => {
         <section id="waitlist" className="container mx-auto px-4 pb-24 max-w-3xl" aria-labelledby="waitlist-heading">
           <Card className="rounded-2xl border bg-card shadow-lg">
             <CardContent className="p-6">
-              <h2 id="waitlist-heading" className="text-xl font-semibold text-card-foreground mb-4">
+              <h2 id="waitlist-heading" className="text-xl font-semibold tracking-tight text-card-foreground mb-4">
                 Try it now (free first export)
               </h2>
               <form onSubmit={handleWaitlistSubmit} className="grid gap-4">

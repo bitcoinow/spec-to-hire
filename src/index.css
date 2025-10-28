@@ -97,6 +97,10 @@ All colors MUST be HSL.
     font-feature-settings: "kern";
   }
   
+  .font-display {
+    font-family: 'DM Serif Display', ui-serif, Georgia, serif;
+  }
+  
   /* Smooth scrolling */
   html {
     scroll-behavior: smooth;
