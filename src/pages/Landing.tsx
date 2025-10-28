@@ -1,141 +1,149 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sparkles, Shield, Zap, CheckCircle2, ArrowRight } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Sparkles, Shield, Zap, CheckCircle2, ArrowRight, Play } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import logo from "@/assets/spec2hire-logo.png";
 
 const Landing = () => {
+  const [email, setEmail] = useState("");
+  const [jobSpec, setJobSpec] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleWaitlistSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !jobSpec) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase.functions.invoke('submit-waitlist', {
+        body: { email, jobSpec }
+      });
+
+      if (error) throw error;
+
+      toast.success("Thanks! We'll send your preview CV soon.");
+      setEmail("");
+      setJobSpec("");
+    } catch (error) {
+      console.error('Waitlist submission error:', error);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const scrollToDemo = () => {
+    document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const scrollToWaitlist = () => {
+    document.getElementById('waitlist')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50" role="navigation" aria-label="Main navigation">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between max-w-7xl">
-          <Link to="/" className="flex items-center gap-3 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg">
+      <nav className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50" role="navigation" aria-label="Main navigation">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between max-w-6xl">
+          <Link to="/" className="flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg">
             <img 
               src={logo} 
               alt="Spec2Hire company logo" 
-              className="w-10 h-10 rounded-lg"
-              width="40"
-              height="40"
+              className="w-8 h-8 rounded-lg"
+              width="32"
+              height="32"
             />
-            <div>
-              <span className="font-bold text-lg">Spec2Hire</span>
-              <p className="text-xs text-muted-foreground">ATS CV Generator</p>
-            </div>
+            <span className="font-semibold text-foreground">Spec2Hire</span>
           </Link>
           
-          <div className="flex items-center gap-2 md:gap-4">
-            <Link to="/faq" className="hidden md:block">
-              <Button variant="ghost" aria-label="Frequently Asked Questions">FAQ</Button>
+          <div className="flex items-center gap-4">
+            <button onClick={scrollToDemo} className="hidden md:block text-foreground hover:text-primary transition-colors">
+              How it works
+            </button>
+            <Link to="/blog" className="hidden md:block text-foreground hover:text-primary transition-colors">
+              Pricing
             </Link>
-            <Link to="/how-to-use" className="hidden md:block">
-              <Button variant="ghost" aria-label="How to use Spec2Hire">How to Use</Button>
-            </Link>
-            <Link to="/blog" className="hidden sm:block">
-              <Button variant="ghost" aria-label="Read our blog">Blog</Button>
-            </Link>
-            <Link to="/auth" className="hidden sm:block">
-              <Button variant="outline" size="sm" aria-label="Sign in to your account">Sign In</Button>
-            </Link>
-            <Link to="/auth?mode=signup">
-              <Button className="bg-gradient-primary" size="sm" aria-label="Get started for free">Get Started</Button>
-            </Link>
+            <button 
+              onClick={scrollToWaitlist}
+              className="inline-flex items-center rounded-lg border border-primary bg-primary text-primary-foreground px-3 py-1.5 font-medium hover:opacity-90 transition-opacity"
+            >
+              Generate my CV
+            </button>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
       <main>
-        <section className="container mx-auto px-4 py-20 max-w-7xl" aria-labelledby="hero-heading">
-          <div className="text-center max-w-4xl mx-auto mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6" role="status" aria-label="Feature highlight">
-              <Sparkles className="w-4 h-4" aria-hidden="true" />
-              AI-Powered CV Generation
-            </div>
-            
-            <h1 id="hero-heading" className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent">
-              Turn Any Job Spec into an ATS-Friendly CV in 60 Seconds
-            </h1>
-            
-            <p className="text-xl text-muted-foreground mb-8 leading-relaxed max-w-3xl mx-auto">
-              Stop spending hours tailoring CVs. Paste any job description and get ATS-optimized CVs and cover letters instantly.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/auth?mode=signup">
-                <Button size="lg" className="bg-gradient-primary text-lg px-8 py-6 focus:ring-2 focus:ring-primary focus:ring-offset-2" aria-label="Generate your CV now">
-                  Generate My CV
-                  <ArrowRight className="w-5 h-5 ml-2" aria-hidden="true" />
-                </Button>
-              </Link>
-              <Link to="/how-to-use">
-                <Button size="lg" variant="outline" className="text-lg px-8 py-6 focus:ring-2 focus:ring-primary focus:ring-offset-2" aria-label="Watch 45 second demo video">
-                  Watch 45s Demo
-                </Button>
-              </Link>
-            </div>
-          </div>
-
-          {/* Features Grid */}
-          <div className="grid md:grid-cols-3 gap-6 mb-20" role="list" aria-label="Key features">
-            <Card className="shadow-lg border-2 hover:border-primary transition-colors bg-card focus-within:ring-2 focus-within:ring-primary" role="listitem">
-              <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary to-foreground flex items-center justify-center mb-4" aria-hidden="true">
-                  <Zap className="w-6 h-6 text-primary-foreground" />
+        <section className="bg-gradient-to-b from-background to-muted/30" aria-labelledby="hero-heading">
+          <div className="container mx-auto px-4 py-16 max-w-6xl">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              <div>
+                <h1 id="hero-heading" className="text-4xl md:text-5xl font-bold leading-tight">
+                  Turn any job spec into an ATS-friendly CV & cover letter in <span className="underline decoration-2 decoration-primary">60 seconds</span>.
+                </h1>
+                <p className="mt-4 text-lg text-muted-foreground">
+                  Paste the job description. We tailor your CV to the role, optimize for ATS, and draft a matching cover letter.
+                </p>
+                <div className="mt-6 flex gap-3">
+                  <button 
+                    onClick={scrollToWaitlist}
+                    className="rounded-lg bg-primary text-primary-foreground px-5 py-3 font-semibold hover:opacity-90 transition-opacity"
+                  >
+                    Generate my CV
+                  </button>
+                  <button 
+                    onClick={scrollToDemo}
+                    className="rounded-lg border border-border px-5 py-3 hover:bg-muted transition-colors flex items-center gap-2"
+                  >
+                    <Play className="w-4 h-4" aria-hidden="true" />
+                    Watch 45s demo
+                  </button>
                 </div>
-                <CardTitle className="text-card-foreground">Lightning Fast</CardTitle>
-                <CardDescription className="text-card-foreground/80">
-                  Generate tailored CVs in under 30 seconds. No more hours of manual editing.
-                </CardDescription>
-              </CardHeader>
-            </Card>
+                <p className="mt-3 text-sm text-muted-foreground">No sign-up required for the first export.</p>
+              </div>
 
-            <Card className="shadow-lg border-2 hover:border-primary transition-colors bg-card focus-within:ring-2 focus-within:ring-primary" role="listitem">
-              <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary to-foreground flex items-center justify-center mb-4" aria-hidden="true">
-                  <Shield className="w-6 h-6 text-primary-foreground" />
-                </div>
-                <CardTitle className="text-card-foreground">ATS-Optimized</CardTitle>
-                <CardDescription className="text-card-foreground/80">
-                  Built to pass Applicant Tracking Systems with keyword optimization and proper formatting.
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card className="shadow-lg border-2 hover:border-primary transition-colors bg-card focus-within:ring-2 focus-within:ring-primary" role="listitem">
-              <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary to-foreground flex items-center justify-center mb-4" aria-hidden="true">
-                  <Sparkles className="w-6 h-6 text-primary-foreground" />
-                </div>
-                <CardTitle className="text-card-foreground">AI-Powered Matching</CardTitle>
-                <CardDescription className="text-card-foreground/80">
-                  Smart algorithms match your experience with job requirements for maximum relevance.
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </div>
-
-          {/* How It Works */}
-          <section className="mb-20" aria-labelledby="how-it-works-heading">
-            <h2 id="how-it-works-heading" className="text-4xl font-bold text-center mb-12 text-foreground">How It Works</h2>
-            
-            <ol className="grid md:grid-cols-4 gap-8" role="list">
-              {[
-                { step: "1", title: "Create Profile", desc: "Set up your master profile once with all your experience" },
-                { step: "2", title: "Paste Job Spec", desc: "Copy any job description you want to apply for" },
-                { step: "3", title: "AI Generation", desc: "Our AI analyzes and creates tailored documents" },
-                { step: "4", title: "Download & Apply", desc: "Get your CV and cover letter ready to send" },
-              ].map((item, i) => (
-                <li key={i} className="text-center" role="listitem">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-foreground text-primary-foreground text-2xl font-bold flex items-center justify-center mx-auto mb-4 shadow-lg" aria-label={`Step ${item.step}`}>
-                    {item.step}
+              <div className="rounded-xl border bg-card p-4 shadow-sm">
+                <div id="demo" className="aspect-video rounded-lg bg-muted grid place-items-center">
+                  <div className="text-center">
+                    <Play className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
+                    <span className="text-muted-foreground">Demo video coming soon</span>
                   </div>
-                  <h3 className="font-semibold text-lg mb-2 text-foreground">{item.title}</h3>
-                  <p className="text-muted-foreground text-sm">{item.desc}</p>
-                </li>
-              ))}
-            </ol>
-          </section>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* How It Works */}
+        <section className="container mx-auto px-4 py-12 max-w-6xl" aria-labelledby="how-it-works-heading">
+          <h2 id="how-it-works-heading" className="text-2xl font-bold mb-6">How it works</h2>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { icon: Zap, title: "Paste job spec", desc: "We parse skills, responsibilities, and must-have keywords." },
+              { icon: Shield, title: "Import your base CV", desc: "Drag-drop .docx or paste experience; we map it to the role." },
+              { icon: Sparkles, title: "Export & apply", desc: "Download ATS-friendly PDF/DOCX + a tailored cover letter." }
+            ].map(({ icon: Icon, title, desc }) => (
+              <Card key={title} className="rounded-xl border bg-card shadow-sm hover:shadow-md transition-shadow">
+                <CardContent className="p-5">
+                  <Icon className="w-8 h-8 text-primary mb-3" aria-hidden="true" />
+                  <h3 className="font-semibold text-card-foreground mb-2">{title}</h3>
+                  <p className="text-muted-foreground">{desc}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+
 
         {/* Benefits */}
         <Card className="shadow-xl bg-gradient-to-br from-card to-muted border-2">
@@ -195,39 +203,59 @@ const Landing = () => {
             </div>
           </section>
 
-          {/* CTA */}
-          <section className="text-center mt-20" aria-labelledby="cta-heading">
-            <h2 id="cta-heading" className="text-4xl font-bold mb-6">Ready to Land Your Dream Job?</h2>
-            <p className="text-xl text-muted-foreground mb-8">
-              Join thousands of job seekers who have streamlined their application process
-            </p>
-            <Link to="/auth?mode=signup">
-              <Button size="lg" className="bg-gradient-primary text-lg px-8 py-6 focus:ring-2 focus:ring-primary focus:ring-offset-2" aria-label="Start creating your CV for free">
-                Get Started Free
-                <ArrowRight className="w-5 h-5 ml-2" aria-hidden="true" />
-              </Button>
-            </Link>
-          </section>
+        {/* Waitlist / First Run */}
+        <section id="waitlist" className="container mx-auto px-4 pb-24 max-w-3xl" aria-labelledby="waitlist-heading">
+          <Card className="rounded-2xl border bg-card shadow-lg">
+            <CardContent className="p-6">
+              <h2 id="waitlist-heading" className="text-xl font-semibold text-card-foreground mb-4">
+                Try it now (free first export)
+              </h2>
+              <form onSubmit={handleWaitlistSubmit} className="grid gap-4">
+                <Input
+                  type="email"
+                  name="email"
+                  required
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="border rounded-lg px-3 py-2"
+                  aria-label="Your email address"
+                />
+                <Textarea
+                  name="jobSpec"
+                  required
+                  rows={6}
+                  placeholder="Paste job description…"
+                  value={jobSpec}
+                  onChange={(e) => setJobSpec(e.target.value)}
+                  className="border rounded-lg px-3 py-2"
+                  aria-label="Job specification"
+                />
+                <Button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className="rounded-lg bg-primary text-primary-foreground px-5 py-3 font-semibold hover:opacity-90 transition-opacity"
+                >
+                  {isSubmitting ? "Submitting..." : "Generate preview"}
+                </Button>
+              </form>
+              <p className="mt-2 text-xs text-muted-foreground">
+                We never share your data. You can delete uploads at any time.
+              </p>
+            </CardContent>
+          </Card>
         </section>
       </main>
 
       {/* Footer */}
       <footer className="border-t border-border bg-muted/30 py-8" role="contentinfo">
-        <div className="container mx-auto px-4 max-w-7xl">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-muted-foreground">
-              © 2025 Spec2Hire. All rights reserved.
-            </p>
-            <nav className="flex items-center gap-6" aria-label="Footer navigation">
-              <Link to="/faq" className="text-sm text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded">
-                FAQ
-              </Link>
-              <Link to="/how-to-use" className="text-sm text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded">
-                How to Use
-              </Link>
-              <Link to="/blog" className="text-sm text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded">
-                Blog
-              </Link>
+        <div className="container mx-auto px-4 max-w-6xl">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+            <span>© {new Date().getFullYear()} Spec2Hire. All rights reserved.</span>
+            <nav className="flex gap-4" aria-label="Footer navigation">
+              <Link to="/faq" className="hover:text-foreground transition-colors">Privacy</Link>
+              <Link to="/how-to-use" className="hover:text-foreground transition-colors">Terms</Link>
+              <Link to="/blog" className="hover:text-foreground transition-colors">Blog</Link>
             </nav>
           </div>
         </div>
