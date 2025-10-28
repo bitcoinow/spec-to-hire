@@ -1,52 +1,12 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Sparkles, Shield, Zap, CheckCircle2, ArrowRight, Play } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Sparkles, Shield, Zap, CheckCircle2, Play } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 import logo from "@/assets/spec2hire-logo.png";
 import StructuredData from "@/components/StructuredData";
 
 const Landing = () => {
-  const [email, setEmail] = useState("");
-  const [jobSpec, setJobSpec] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleWaitlistSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !jobSpec) {
-      toast.error("Please fill in all fields");
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const { error } = await supabase.functions.invoke('submit-waitlist', {
-        body: { email, jobSpec }
-      });
-
-      if (error) throw error;
-
-      toast.success("Thanks! We'll send your preview CV soon.");
-      setEmail("");
-      setJobSpec("");
-    } catch (error) {
-      console.error('Waitlist submission error:', error);
-      toast.error("Something went wrong. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   const scrollToDemo = () => {
     document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const scrollToWaitlist = () => {
-    document.getElementById('waitlist')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -77,12 +37,12 @@ const Landing = () => {
             <Link to="/blog" className="hidden md:block text-sm text-foreground hover:text-primary transition-colors">
               Blog
             </Link>
-            <button 
-              onClick={scrollToWaitlist}
+            <Link 
+              to="/auth"
               className="inline-flex items-center rounded-lg border border-primary bg-primary text-primary-foreground px-3 py-1.5 text-sm font-medium hover:opacity-90 transition-opacity"
             >
-              Generate my CV
-            </button>
+              Get Started Free
+            </Link>
           </div>
         </div>
       </nav>
@@ -100,12 +60,12 @@ const Landing = () => {
                   Paste the job description. We tailor your CV to the role, optimize for ATS, and draft a matching cover letter.
                 </p>
                 <div className="mt-6 flex gap-3">
-                  <button 
-                    onClick={scrollToWaitlist}
+                  <Link 
+                    to="/auth"
                     className="rounded-lg bg-primary text-primary-foreground px-5 py-3 font-semibold hover:opacity-90 transition-opacity"
                   >
-                    Generate my CV
-                  </button>
+                    Start Free Trial
+                  </Link>
                   <button 
                     onClick={scrollToDemo}
                     className="rounded-lg border border-border px-5 py-3 hover:bg-muted transition-colors flex items-center gap-2"
@@ -114,7 +74,7 @@ const Landing = () => {
                     Watch 45s demo
                   </button>
                 </div>
-                <p className="mt-3 text-sm text-muted-foreground">No sign-up required for the first export.</p>
+                <p className="mt-3 text-sm text-muted-foreground">First 3 exports free • No credit card required</p>
               </div>
 
               <div className="rounded-xl border bg-card p-4 shadow-sm">
@@ -209,44 +169,24 @@ const Landing = () => {
             </div>
           </section>
 
-        {/* Waitlist / First Run */}
-        <section id="waitlist" className="container mx-auto px-4 pb-24 max-w-3xl" aria-labelledby="waitlist-heading">
+        {/* CTA Section */}
+        <section className="container mx-auto px-4 pb-24 max-w-3xl text-center" aria-labelledby="cta-heading">
           <Card className="rounded-2xl border bg-card shadow-lg">
-            <CardContent className="p-6">
-              <h2 id="waitlist-heading" className="text-xl font-semibold tracking-tight text-card-foreground mb-4">
-                Try it now (free first export)
+            <CardContent className="p-12">
+              <h2 id="cta-heading" className="text-3xl font-bold tracking-tight text-card-foreground mb-4">
+                Ready to Land Your Dream Job?
               </h2>
-              <form onSubmit={handleWaitlistSubmit} className="grid gap-4">
-                <Input
-                  type="email"
-                  name="email"
-                  required
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="border rounded-lg px-3 py-2"
-                  aria-label="Your email address"
-                />
-                <Textarea
-                  name="jobSpec"
-                  required
-                  rows={6}
-                  placeholder="Paste job description…"
-                  value={jobSpec}
-                  onChange={(e) => setJobSpec(e.target.value)}
-                  className="border rounded-lg px-3 py-2"
-                  aria-label="Job specification"
-                />
-                <Button 
-                  type="submit" 
-                  disabled={isSubmitting}
-                  className="rounded-lg bg-primary text-primary-foreground px-5 py-3 font-semibold hover:opacity-90 transition-opacity"
-                >
-                  {isSubmitting ? "Submitting..." : "Generate preview"}
-                </Button>
-              </form>
-              <p className="mt-2 text-xs text-muted-foreground">
-                We never share your data. You can delete uploads at any time.
+              <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+                Join thousands of job seekers who have transformed their applications with Spec2Hire
+              </p>
+              <Link 
+                to="/auth"
+                className="inline-flex items-center rounded-lg bg-primary text-primary-foreground px-6 py-3 font-semibold hover:opacity-90 transition-opacity"
+              >
+                Start Your Free Trial
+              </Link>
+              <p className="mt-3 text-sm text-muted-foreground">
+                First 3 exports free • No credit card required
               </p>
             </CardContent>
           </Card>
