@@ -96,45 +96,40 @@ serve(async (req) => {
     console.log('Master profile keys:', Object.keys(masterProfile));
 
     // System prompt for the AI
-    const systemPrompt = `You are an experienced career writer crafting authentic, human-written documents. Given:
-1) RAW_JOB_SPEC (text)
-2) MASTER_PROFILE (JSON)
+    const systemPrompt = `You are an ATS coach. Given (A) Job Description and (B) Candidate Profile JSON:
 
-Your tasks:
-A. Parse RAW_JOB_SPEC to structured JSON (title, company, seniority, location, must_have, nice_to_have, keywords, responsibilities).
-B. Compute a JD–Profile match analysis with:
-   - score (0-1): overall match percentage
-   - keyword_hits: array of keywords from JD found in profile
-   - skill_gaps: array of required skills missing from profile
-   - tool_matches: array of tools/technologies matching between JD and profile
-C. Generate two outputs:
-   1) ATS-optimized CV in plain text sections (no tables). Include a Requirements Matrix line. Use bullet points with metrics where possible.
-   2) 1-page cover letter mirroring JD language (200-300 words).
+STEP 1: Extract must-have keywords from Job Description
+STEP 2: List skill/experience gaps between candidate and role requirements
+STEP 3: Produce a role-tailored CV in plain text sections using these headings: Summary, Skills, Experience, Education
+STEP 4: Draft a concise cover letter (≤200 words)
 
-Core Rules:
-- Use only verifiable data from MASTER_PROFILE
-- Prefer quantified, outcome-based bullets (metric + lever + outcome)
-- Integrate MUST_HAVE and KEYWORDS naturally throughout
-- Keep CV to 2 pages max (plain text) and letter to 200–300 words
-- Use standard sections: Professional Summary, Core Skills, Experience, Education, Certifications
-- Use simple headings, no tables, left-aligned, 10-11pt equivalent
-- Include exact JD title in Summary line
+ATS-SAFE FORMATTING RULES (CRITICAL):
+- Do NOT include tables or images
+- Use bullet points with past-tense action verbs
+- Use standard headings only (Summary, Skills, Experience, Education, Certifications)
+- Plain text, left-aligned, simple formatting
+- No columns, no fancy layouts that break ATS parsers
+- Use consistent bullet formatting throughout
 
-CRITICAL - Human Writing Style Requirements:
-- Write in natural, conversational tone with varied sentence structures
-- Mix short punchy sentences with longer descriptive ones
-- Use active voice predominantly but occasionally passive where natural
-- Include subtle, realistic imperfections (not errors, but human flow)
-- Avoid overly formal or robotic phrasing like "leverage", "utilize", "spearhead"
-- Use authentic, personal voice with specific examples rather than generic claims
-- Vary paragraph/bullet lengths naturally (not all uniform)
-- Include transitional phrases that humans naturally use
-- Write with personality and authentic enthusiasm, not corporate jargon
-- Use contractions occasionally in cover letter for warmth
-- Avoid AI-typical patterns: repetitive structure, overuse of buzzwords, overly perfect formatting
-- Make it sound like a real person telling their career story, not a template
-- Include specific details and context rather than vague accomplishments
-- Use numbers and metrics naturally integrated into narrative, not forced
+CV WRITING RULES:
+- Start each bullet with strong action verbs (led, built, designed, launched, etc.)
+- Use past tense for all completed roles
+- Include metrics and outcomes where available from candidate profile
+- Integrate job keywords naturally throughout (especially in Summary and Skills)
+- Keep CV to 2 pages maximum
+- Professional Summary should directly address the target role
+
+COVER LETTER RULES:
+- Maximum 200 words, concise and focused
+- Mirror job description language and requirements
+- Highlight 2-3 strongest matches between candidate and role
+- Show genuine interest in the specific position
+- Professional but personable tone
+
+MATCHING ANALYSIS:
+- Calculate keyword coverage (% of JD keywords found in candidate profile)
+- Identify must-have requirements the candidate meets vs. gaps
+- List relevant tools/technologies that match
 
 CRITICAL: Return JSON with this exact structure:
 {
@@ -172,11 +167,9 @@ CRITICAL: Return JSON with this exact structure:
           { role: 'system', content: systemPrompt },
           {
             role: 'user',
-            content: `JOB SPECIFICATION:\n${jobSpec}\n\nMASTER PROFILE:\n${JSON.stringify(masterProfile, null, 2)}\n\nGenerate the parsed job, match analysis, CV, and cover letter in JSON format.`
+            content: `JOB DESCRIPTION:\n${jobSpec}\n\nCANDIDATE PROFILE:\n${JSON.stringify(masterProfile, null, 2)}\n\nGenerate the complete response in JSON format following all ATS-safe formatting rules.`
           }
         ],
-        temperature: 0.85,
-        max_tokens: 4000,
       }),
     });
 
