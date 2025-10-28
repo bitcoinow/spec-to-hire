@@ -8,6 +8,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import logo from "@/assets/spec2hire-logo.png";
+import StructuredData from "@/components/StructuredData";
 
 const Landing = () => {
   const [email, setEmail] = useState("");
@@ -49,8 +50,10 @@ const Landing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Navigation */}
+    <>
+      <StructuredData />
+      <div className="min-h-screen bg-background">
+        {/* Navigation */}
       <nav className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50" role="navigation" aria-label="Main navigation">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between max-w-6xl">
           <Link to="/" className="flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg">
@@ -260,7 +263,8 @@ const Landing = () => {
           </div>
         </div>
       </footer>
-    </div>
+      </div>
+    </>
   );
 };
 
