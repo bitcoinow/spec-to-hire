@@ -2,8 +2,13 @@ project_id = "mggtjhyvmfjlcxjauqvt"
 
 [functions.generate-cv]
 
+[functions.parse-job-spec]
+
 [functions.create-checkout]
 
 [functions.check-subscription]
 
 [functions.generate-blog]
+
+[functions.submit-waitlist]
+verify_jwt = false
