@@ -199,8 +199,8 @@ const Landing = () => {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
             <span>© {new Date().getFullYear()} Spec2Hire. All rights reserved.</span>
             <nav className="flex gap-4" aria-label="Footer navigation">
-              <Link to="/faq" className="hover:text-foreground transition-colors">Privacy</Link>
-              <Link to="/how-to-use" className="hover:text-foreground transition-colors">Terms</Link>
+              <Link to="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
+              <Link to="/terms" className="hover:text-foreground transition-colors">Terms</Link>
               <Link to="/blog" className="hover:text-foreground transition-colors">Blog</Link>
             </nav>
           </div>
