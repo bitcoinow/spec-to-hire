@@ -54,10 +54,10 @@ const Landing = () => {
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div>
                 <h1 id="hero-heading" className="text-4xl md:text-5xl font-bold tracking-tight leading-[1.1]">
-                  Turn any job spec into an ATS-friendly CV & cover letter in <span className="font-display">60 seconds</span>.
+                  ATS-friendly CV & cover letter in <span className="font-display">60 seconds</span>
                 </h1>
-                <p className="mt-4 text-lg text-muted-foreground leading-relaxed">
-                  Paste the job description. We tailor your CV to the role, optimize for ATS, and draft a matching cover letter.
+                <p className="mt-4 text-base md:text-lg text-muted-foreground leading-relaxed">
+                  Paste any job spec. We tailor your CV, optimize for ATS, and draft a matching cover letter instantly.
                 </p>
                 <div className="mt-6 flex gap-3">
                   <Link 
