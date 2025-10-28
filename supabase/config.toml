@@ -6,6 +6,8 @@ project_id = "mggtjhyvmfjlcxjauqvt"
 
 [functions.create-checkout]
 
+[functions.create-one-time-payment]
+
 [functions.check-subscription]
 
 [functions.generate-blog]

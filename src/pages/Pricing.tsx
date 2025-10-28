@@ -1,11 +1,50 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import logo from "@/assets/spec2hire-logo.png";
 
 const Pricing = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState<string | null>(null);
+
+  const handleSubscribe = async () => {
+    setLoading("pro");
+    try {
+      const { data, error } = await supabase.functions.invoke('create-checkout');
+      if (error) throw error;
+      if (data?.url) window.open(data.url, '_blank');
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to start checkout",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handleOneTimePayment = async () => {
+    setLoading("onetime");
+    try {
+      const { data, error } = await supabase.functions.invoke('create-one-time-payment');
+      if (error) throw error;
+      if (data?.url) window.open(data.url, '_blank');
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to start checkout",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(null);
+    }
+  };
 
   const plans = [
     {
@@ -139,9 +178,20 @@ const Pricing = () => {
                 <Button 
                   className="w-full text-sm font-semibold"
                   variant={plan.popular ? "default" : "outline"}
-                  onClick={() => navigate('/auth')}
+                  onClick={() => {
+                    if (plan.name === "Pro") {
+                      handleSubscribe();
+                    } else if (plan.name === "One-Time") {
+                      handleOneTimePayment();
+                    } else {
+                      navigate('/auth');
+                    }
+                  }}
+                  disabled={loading !== null}
                 >
-                  {plan.cta}
+                  {loading === "pro" && plan.name === "Pro" ? "Loading..." : 
+                   loading === "onetime" && plan.name === "One-Time" ? "Loading..." : 
+                   plan.cta}
                 </Button>
               </CardContent>
             </Card>

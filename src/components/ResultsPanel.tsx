@@ -7,6 +7,14 @@ import { useToast } from "@/hooks/use-toast";
 import type { GeneratedResults } from "@/pages/Index";
 import { MatchScore } from "./MatchScore";
 import { MultiCompanySender } from "./MultiCompanySender";
+import { exportToPDF, exportToDOCX } from "@/lib/exportUtils";
+import { useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface ResultsPanelProps {
   results: GeneratedResults | null;
@@ -15,6 +23,7 @@ interface ResultsPanelProps {
 
 export const ResultsPanel = ({ results, isGenerating }: ResultsPanelProps) => {
   const { toast } = useToast();
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const handleCopy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
@@ -24,20 +33,31 @@ export const ResultsPanel = ({ results, isGenerating }: ResultsPanelProps) => {
     });
   };
 
-  const handleDownload = (text: string, filename: string) => {
-    const blob = new Blob([text], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast({
-      title: "Downloaded!",
-      description: `${filename} has been downloaded`,
-    });
+  const handleDownload = async (text: string, baseName: string, format: 'pdf' | 'docx') => {
+    setIsDownloading(true);
+    try {
+      const filename = `${baseName}.${format}`;
+      
+      if (format === 'pdf') {
+        exportToPDF(text, filename);
+      } else {
+        await exportToDOCX(text, filename);
+      }
+      
+      toast({
+        title: "Downloaded!",
+        description: `${filename} has been downloaded`,
+      });
+    } catch (error) {
+      console.error('Download error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to download file",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   if (isGenerating) {
@@ -108,14 +128,26 @@ export const ResultsPanel = ({ results, isGenerating }: ResultsPanelProps) => {
                 <Copy className="w-4 h-4 mr-2" />
                 Copy
               </Button>
-              <Button 
-                onClick={() => handleDownload(results.cv_text, `${results.parsed_job.title}_CV.txt`)}
-                variant="outline" 
-                size="sm"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Download
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    disabled={isDownloading}
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    {isDownloading ? "Downloading..." : "Download"}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={() => handleDownload(results.cv_text, `${results.parsed_job.title}_CV`, 'pdf')}>
+                    Download as PDF
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleDownload(results.cv_text, `${results.parsed_job.title}_CV`, 'docx')}>
+                    Download as DOCX
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
 
             <div className="bg-card border rounded-lg p-6 max-h-[600px] overflow-y-auto">
@@ -135,14 +167,26 @@ export const ResultsPanel = ({ results, isGenerating }: ResultsPanelProps) => {
                 <Copy className="w-4 h-4 mr-2" />
                 Copy
               </Button>
-              <Button 
-                onClick={() => handleDownload(results.cover_letter, `${results.parsed_job.title}_CoverLetter.txt`)}
-                variant="outline" 
-                size="sm"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Download
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    disabled={isDownloading}
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    {isDownloading ? "Downloading..." : "Download"}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={() => handleDownload(results.cover_letter, `${results.parsed_job.title}_CoverLetter`, 'pdf')}>
+                    Download as PDF
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleDownload(results.cover_letter, `${results.parsed_job.title}_CoverLetter`, 'docx')}>
+                    Download as DOCX
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
 
             <div className="bg-card border rounded-lg p-6 max-h-[600px] overflow-y-auto">
