@@ -3,6 +3,7 @@ import { Sparkles, Shield, Zap, CheckCircle2, Play } from "lucide-react";
 import { Link } from "react-router-dom";
 import logo from "@/assets/spec2hire-logo.png";
 import StructuredData from "@/components/StructuredData";
+import SEOHead from "@/components/SEOHead";
 
 const Landing = () => {
   const scrollToDemo = () => {
@@ -11,6 +12,7 @@ const Landing = () => {
 
   return (
     <>
+      <SEOHead />
       <StructuredData />
       <div className="min-h-screen bg-background">
         {/* Navigation */}

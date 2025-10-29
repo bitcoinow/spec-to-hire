@@ -1,10 +1,17 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import SEOHead from "@/components/SEOHead";
 
 const Privacy = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <SEOHead 
+        title="Privacy Policy — Spec2Hire"
+        description="Learn how Spec2Hire collects, uses, and protects your personal information. Our privacy policy outlines your data rights and our security practices."
+        canonical="https://spec-to-hire.lovable.app/privacy"
+      />
+      <div className="min-h-screen bg-background">
       <nav className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-3 max-w-4xl">
           <Link to="/" className="inline-flex items-center gap-2 text-foreground hover:text-primary transition-colors">
@@ -123,6 +130,7 @@ const Privacy = () => {
         </Card>
       </main>
     </div>
+    </>
   );
 };
 

@@ -1,10 +1,17 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import SEOHead from "@/components/SEOHead";
 
 const Terms = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <SEOHead 
+        title="Terms of Service — Spec2Hire"
+        description="Read Spec2Hire's terms of service to understand the rules and regulations for using our AI-powered CV and cover letter generation platform."
+        canonical="https://spec-to-hire.lovable.app/terms"
+      />
+      <div className="min-h-screen bg-background">
       <nav className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-3 max-w-4xl">
           <Link to="/" className="inline-flex items-center gap-2 text-foreground hover:text-primary transition-colors">
@@ -154,6 +161,7 @@ const Terms = () => {
         </Card>
       </main>
     </div>
+    </>
   );
 };
 

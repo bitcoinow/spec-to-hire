@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Briefcase, ArrowLeft, BookOpen, User, FileText, Sparkles, Download } from "lucide-react";
+import SEOHead from "@/components/SEOHead";
 
 const HowToUse = () => {
   const steps = [
@@ -64,7 +65,13 @@ const HowToUse = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <SEOHead 
+        title="How to Use — Spec2Hire"
+        description="Step-by-step guide to using Spec2Hire. Learn how to create your Master Profile, paste job specs, analyze matches, and export ATS-optimized CVs."
+        canonical="https://spec-to-hire.lovable.app/how-to-use"
+      />
+      <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between max-w-7xl">
@@ -191,6 +198,7 @@ const HowToUse = () => {
         </div>
       </main>
     </div>
+    </>
   );
 };
 

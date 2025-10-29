@@ -1,5 +1,18 @@
 export default function StructuredData() {
-  const data = {
+  const organization = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Spec2Hire",
+    "url": "https://spec-to-hire.lovable.app",
+    "logo": "https://spec-to-hire.lovable.app/og-image.jpg",
+    "description": "AI-powered CV and cover letter generation platform",
+    "sameAs": [
+      "https://twitter.com/spec2hire",
+      "https://www.linkedin.com/company/spec2hire"
+    ]
+  };
+
+  const application = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "name": "Spec2Hire",
@@ -7,6 +20,10 @@ export default function StructuredData() {
     "operatingSystem": "Web",
     "url": "https://spec-to-hire.lovable.app",
     "description": "Turn any job spec into an ATS-friendly CV & cover letter in 60 seconds. AI-powered CV generator that transforms job descriptions into ATS-optimized CVs and cover letters instantly.",
+    "provider": {
+      "@type": "Organization",
+      "name": "Spec2Hire"
+    },
     "offers": { 
       "@type": "Offer", 
       "price": "0", 
@@ -28,9 +45,15 @@ export default function StructuredData() {
   };
   
   return (
-    <script 
-      type="application/ld+json" 
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} 
-    />
+    <>
+      <script 
+        type="application/ld+json" 
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organization) }} 
+      />
+      <script 
+        type="application/ld+json" 
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(application) }} 
+      />
+    </>
   );
 }
