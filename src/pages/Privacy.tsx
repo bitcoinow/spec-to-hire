@@ -1,16 +1,16 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import SEOHead from "@/components/SEOHead";
+import { Helmet } from "react-helmet-async";
 
 const Privacy = () => {
   return (
     <>
-      <SEOHead 
-        title="Privacy Policy — Spec2Hire"
-        description="Learn how Spec2Hire collects, uses, and protects your personal information. Our privacy policy outlines your data rights and our security practices."
-        canonical="https://spec-to-hire.lovable.app/privacy"
-      />
+      <Helmet>
+        <title>Privacy Policy — Spec2Hire</title>
+        <meta name="description" content="Learn how Spec2Hire collects, uses, and protects your personal information." />
+        <link rel="canonical" href="https://spec-to-hire.lovable.app/privacy" />
+      </Helmet>
       <div className="min-h-screen bg-background">
       <nav className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-3 max-w-4xl">

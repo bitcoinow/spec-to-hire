@@ -5,9 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import ReactMarkdown from "react-markdown";
 import logo from "@/assets/spec2hire-logo.png";
-import SEOHead from "@/components/SEOHead";
 
 const Blog = () => {
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
@@ -109,11 +109,11 @@ const Blog = () => {
 
   return (
     <>
-      <SEOHead 
-        title="Blog — Spec2Hire"
-        description="Job market insights, career tips, and ATS optimization strategies. Stay updated with the latest trends for job seekers."
-        canonical="https://spec-to-hire.lovable.app/blog"
-      />
+      <Helmet>
+        <title>Blog — Spec2Hire</title>
+        <meta name="description" content="Job market insights, career tips, and ATS optimization strategies for job seekers." />
+        <link rel="canonical" href="https://spec-to-hire.lovable.app/blog" />
+      </Helmet>
       <div className="min-h-screen bg-background">
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between max-w-7xl">

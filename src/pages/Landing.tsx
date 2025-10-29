@@ -1,9 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Sparkles, Shield, Zap, CheckCircle2, Play } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import logo from "@/assets/spec2hire-logo.png";
 import StructuredData from "@/components/StructuredData";
-import SEOHead from "@/components/SEOHead";
 
 const Landing = () => {
   const scrollToDemo = () => {
@@ -12,7 +12,11 @@ const Landing = () => {
 
   return (
     <>
-      <SEOHead />
+      <Helmet>
+        <title>Spec2Hire — ATS CV in 60 Seconds</title>
+        <meta name="description" content="Paste any job description and get a tailored, ATS-optimized CV + cover letter." />
+        <link rel="canonical" href="https://spec-to-hire.lovable.app/" />
+      </Helmet>
       <StructuredData />
       <div className="min-h-screen bg-background">
         {/* Navigation */}

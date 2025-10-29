@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Briefcase, ArrowLeft, BookOpen, User, FileText, Sparkles, Download } from "lucide-react";
-import SEOHead from "@/components/SEOHead";
+import { Helmet } from "react-helmet-async";
 
 const HowToUse = () => {
   const steps = [
@@ -66,11 +66,11 @@ const HowToUse = () => {
 
   return (
     <>
-      <SEOHead 
-        title="How to Use — Spec2Hire"
-        description="Step-by-step guide to using Spec2Hire. Learn how to create your Master Profile, paste job specs, analyze matches, and export ATS-optimized CVs."
-        canonical="https://spec-to-hire.lovable.app/how-to-use"
-      />
+      <Helmet>
+        <title>How to Use — Spec2Hire</title>
+        <meta name="description" content="Step-by-step guide to using Spec2Hire. Create your profile, paste job specs, and export ATS-optimized CVs." />
+        <link rel="canonical" href="https://spec-to-hire.lovable.app/how-to-use" />
+      </Helmet>
       <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Briefcase, ArrowLeft, HelpCircle } from "lucide-react";
-import SEOHead from "@/components/SEOHead";
+import { Helmet } from "react-helmet-async";
 
 const FAQ = () => {
   const faqs = [
@@ -51,11 +51,11 @@ const FAQ = () => {
 
   return (
     <>
-      <SEOHead 
-        title="FAQ — Spec2Hire"
-        description="Frequently asked questions about Spec2Hire. Learn about ATS optimization, match scoring, Master Profile, exports, data security, and more."
-        canonical="https://spec-to-hire.lovable.app/faq"
-      />
+      <Helmet>
+        <title>FAQ — Spec2Hire</title>
+        <meta name="description" content="Frequently asked questions about Spec2Hire. Learn about ATS optimization, match scoring, and more." />
+        <link rel="canonical" href="https://spec-to-hire.lovable.app/faq" />
+      </Helmet>
       <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">

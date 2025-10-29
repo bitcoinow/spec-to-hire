@@ -5,8 +5,8 @@ import { Check } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Helmet } from "react-helmet-async";
 import logo from "@/assets/spec2hire-logo.png";
-import SEOHead from "@/components/SEOHead";
 
 const Pricing = () => {
   const navigate = useNavigate();
@@ -97,11 +97,11 @@ const Pricing = () => {
 
   return (
     <>
-      <SEOHead 
-        title="Pricing — Spec2Hire"
-        description="Choose your plan: Free trial, Pro subscription (£20/month) for unlimited CV generations, or pay-as-you-go (£5/CV). ATS-optimized formatting included."
-        canonical="https://spec-to-hire.lovable.app/pricing"
-      />
+      <Helmet>
+        <title>Pricing — Spec2Hire</title>
+        <meta name="description" content="Choose your plan: Free trial, Pro (£20/month) for unlimited CVs, or pay-as-you-go (£5/CV)." />
+        <link rel="canonical" href="https://spec-to-hire.lovable.app/pricing" />
+      </Helmet>
       <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
