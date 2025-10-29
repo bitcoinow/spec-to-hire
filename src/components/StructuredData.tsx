@@ -6,17 +6,25 @@ export default function StructuredData() {
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Web",
     "url": "https://spec-to-hire.lovable.app",
-    "description": "Turn any job spec into an ATS-friendly CV & cover letter in 60 seconds.",
+    "description": "Turn any job spec into an ATS-friendly CV & cover letter in 60 seconds. AI-powered CV generator that transforms job descriptions into ATS-optimized CVs and cover letters instantly.",
     "offers": { 
       "@type": "Offer", 
       "price": "0", 
-      "priceCurrency": "GBP" 
+      "priceCurrency": "GBP",
+      "description": "First 3 exports free, no credit card required"
     },
     "aggregateRating": {
       "@type": "AggregateRating",
       "ratingValue": "4.8",
       "ratingCount": "127"
-    }
+    },
+    "featureList": [
+      "ATS-compliant formatting",
+      "Keyword optimization",
+      "Automated cover letter generation",
+      "Match scoring",
+      "Multiple export formats (PDF/DOCX)"
+    ]
   };
   
   return (
