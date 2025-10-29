@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Helmet } from "react-helmet-async";
+import { AdSpace } from "@/components/AdSpace";
 import logo from "@/assets/spec2hire-logo.png";
 
 const Pricing = () => {
@@ -139,6 +140,8 @@ const Pricing = () => {
           </p>
         </div>
 
+        <AdSpace format="horizontal" className="mb-8" slot="pricing-top" />
+
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {plans.map((plan) => (
             <Card 
@@ -204,6 +207,8 @@ const Pricing = () => {
             </Card>
           ))}
         </div>
+
+        <AdSpace format="horizontal" className="mt-12 mb-8" slot="pricing-bottom" />
 
         <div className="mt-16 text-center">
           <p className="text-muted-foreground text-[15px] leading-relaxed">
