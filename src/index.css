@@ -42,6 +42,11 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 0 0% 15%;
     --sidebar-border: 0 0% 90%;
     --sidebar-ring: 0 0% 60%;
+    
+    /* Card hover colors for light mode */
+    --card-hover-1: 220 100% 97%;
+    --card-hover-2: 142 76% 96%;
+    --card-hover-3: 280 100% 97%;
   }
 
   .dark {
@@ -140,5 +145,25 @@ All colors MUST be HSL.
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+  }
+  
+  /* Card hover effects for light mode only */
+  .hover-card-1:hover {
+    background-color: hsl(var(--card-hover-1));
+  }
+  
+  .hover-card-2:hover {
+    background-color: hsl(var(--card-hover-2));
+  }
+  
+  .hover-card-3:hover {
+    background-color: hsl(var(--card-hover-3));
+  }
+  
+  /* Disable hover colors in dark mode */
+  .dark .hover-card-1:hover,
+  .dark .hover-card-2:hover,
+  .dark .hover-card-3:hover {
+    background-color: hsl(var(--card));
   }
 }

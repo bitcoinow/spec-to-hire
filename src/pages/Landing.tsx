@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import logo from "@/assets/spec2hire-logo.png";
 import StructuredData from "@/components/StructuredData";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Landing = () => {
   const scrollToDemo = () => {
@@ -43,6 +44,7 @@ const Landing = () => {
             <Link to="/blog" className="hidden md:block text-sm text-foreground hover:text-primary transition-colors">
               Blog
             </Link>
+            <ThemeToggle />
             <Link 
               to="/auth"
               className="inline-flex items-center rounded-lg border border-primary bg-primary text-primary-foreground px-3 py-1.5 text-sm font-medium hover:opacity-90 transition-opacity"
@@ -104,10 +106,10 @@ const Landing = () => {
               { icon: Zap, title: "Paste job spec", desc: "We parse skills, responsibilities, and must-have keywords." },
               { icon: Shield, title: "Import your base CV", desc: "Drag-drop .docx or paste experience; we map it to the role." },
               { icon: Sparkles, title: "Export & apply", desc: "Download ATS-friendly PDF/DOCX + a tailored cover letter." }
-            ].map(({ icon: Icon, title, desc }) => (
-              <Card key={title} className="rounded-xl border bg-card shadow-sm hover:shadow-md transition-shadow">
+            ].map(({ icon: Icon, title, desc }, idx) => (
+              <Card key={title} className={`rounded-xl border bg-card shadow-sm hover:shadow-md transition-all duration-300 group hover-card-${idx + 1}`}>
                 <CardContent className="p-5">
-                  <Icon className="w-8 h-8 text-primary mb-3" aria-hidden="true" />
+                  <Icon className="w-8 h-8 text-primary mb-3 group-hover:scale-110 transition-transform duration-300" aria-hidden="true" />
                   <h3 className="text-lg font-semibold mb-2">{title}</h3>
                   <p className="text-[15px] text-muted-foreground leading-relaxed">{desc}</p>
                 </CardContent>
@@ -150,7 +152,7 @@ const Landing = () => {
                 { name: "James Chen", role: "Product Manager", text: "The AI perfectly matches my experience to job requirements. Best £20 I've spent on my career." },
                 { name: "Emily Rodriguez", role: "Marketing Director", text: "Finally landed my dream role! The cover letters are so well-written, I barely need to edit them." },
               ].map((testimonial, i) => (
-                <Card key={i} className="shadow-lg bg-card">
+                <Card key={i} className={`shadow-lg bg-card transition-all duration-300 group hover-card-${i + 1}`}>
                   <CardContent className="pt-6">
                     <p className="text-[15px] leading-relaxed text-card-foreground mb-4 italic">"{testimonial.text}"</p>
                     <div>
