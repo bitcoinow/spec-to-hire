@@ -114,10 +114,6 @@ const BlogAdmin = () => {
       const { error } = await supabase.from("blog_posts").insert({
         title: generatedBlog.title,
         slug: generatedBlog.slug,
-        meta_title: generatedBlog.metaTitle,
-        meta_description: generatedBlog.metaDescription,
-        focus_keyword: generatedBlog.focusKeyword,
-        secondary_keywords: generatedBlog.secondaryKeywords,
         excerpt: generatedBlog.excerpt,
         content: generatedBlog.content,
         tags: generatedBlog.tags,
