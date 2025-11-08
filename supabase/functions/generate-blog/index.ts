@@ -86,65 +86,7 @@ serve(async (req) => {
 
     console.log('Generating blog post for topic:', topic);
 
-    const systemPrompt = `You are an expert SEO content writer specializing in job market news and career advice.
-
-CRITICAL SEO & STRUCTURE REQUIREMENTS:
-
-1. TITLE (H1):
-   - Maximum 60 characters for SEO
-   - Include focus keyword naturally
-   - Make it compelling and click-worthy
-
-2. META INFORMATION:
-   - Meta Description: Exactly 150-155 characters, include CTA
-   - Focus Keyword: Main keyword for the article
-   - Secondary Keywords: 2-3 related terms
-
-3. OPENING HOOK (2 short paragraphs):
-   - First paragraph: Engaging question or statement (2-3 sentences)
-   - Second paragraph: Clear value proposition or bottom line (1-2 sentences)
-
-4. CONTENT STRUCTURE (H2/H3 Hierarchy):
-   - Use ## for main sections (H2)
-   - Use ### for subsections (H3)
-   - Each section: 2-4 short paragraphs max
-   - Paragraphs: 2-4 sentences each (never more than 5)
-
-5. FORMATTING FOR SCANNABILITY:
-   - Use bullet points for lists
-   - Use **bold text** for key terms and emphasis
-   - Include "Before/After" examples where relevant
-   - Add plenty of white space between sections
-
-6. REQUIRED SECTIONS:
-   - Strong introduction with hook
-   - 3-5 main content sections with H2 headings
-   - FAQ section (3-5 questions) for featured snippets
-   - Clear conclusion with actionable CTA
-
-7. SEO BEST PRACTICES:
-   - Naturally integrate focus keyword 3-5 times
-   - Use secondary keywords throughout
-   - Include internal linking suggestions (mention relevant topics)
-   - Write descriptive, keyword-rich subheadings
-   - Maintain conversational, engaging tone
-
-8. WORD COUNT: 800-1200 words total
-
-CRITICAL: Return ONLY a valid JSON object. Do NOT include any text before or after the JSON.
-Do NOT wrap the JSON in markdown code blocks.
-
-Required JSON structure:
-{
-  "title": "SEO-optimized title (max 60 chars)",
-  "metaTitle": "Meta title for SEO (max 60 chars)",  
-  "metaDescription": "Compelling meta description with CTA (150-155 chars)",
-  "focusKeyword": "main keyword phrase",
-  "secondaryKeywords": ["keyword1", "keyword2", "keyword3"],
-  "excerpt": "Brief summary (max 200 characters)",
-  "content": "Full markdown content following all structure rules above",
-  "tags": ["tag1", "tag2", "tag3"]
-}`;
+    const systemPrompt = `You are an expert SEO content writer specializing in job market news and career advice. Generate comprehensive blog posts with proper SEO optimization.`;
 
     const userPrompt = `Write a blog post about: ${topic}${jobSiteUrl ? `\n\nInclude information relevant to job seekers using ${jobSiteUrl}` : ''}`;
 
@@ -162,8 +104,57 @@ Required JSON structure:
             { role: 'system', content: systemPrompt },
             { role: 'user', content: userPrompt }
           ],
-          response_format: { type: "json_object" },
-          temperature: 0.7
+          tools: [
+            {
+              type: "function",
+              function: {
+                name: "create_blog_post",
+                description: "Create a comprehensive SEO-optimized blog post",
+                parameters: {
+                  type: "object",
+                  properties: {
+                    title: {
+                      type: "string",
+                      description: "SEO-optimized title (max 60 characters), compelling and click-worthy"
+                    },
+                    metaTitle: {
+                      type: "string",
+                      description: "Meta title for SEO (max 60 characters)"
+                    },
+                    metaDescription: {
+                      type: "string",
+                      description: "Compelling meta description with CTA (150-155 characters)"
+                    },
+                    focusKeyword: {
+                      type: "string",
+                      description: "Main keyword phrase for SEO"
+                    },
+                    secondaryKeywords: {
+                      type: "array",
+                      items: { type: "string" },
+                      description: "2-3 related keyword terms"
+                    },
+                    excerpt: {
+                      type: "string",
+                      description: "Brief summary (max 200 characters)"
+                    },
+                    content: {
+                      type: "string",
+                      description: "Full markdown content (800-1200 words). Use ## for H2, ### for H3. Include engaging hook, 3-5 main sections, FAQ section with 3-5 questions, and clear conclusion with CTA. Use bullet points, bold text, maintain 2-4 sentence paragraphs."
+                    },
+                    tags: {
+                      type: "array",
+                      items: { type: "string" },
+                      description: "3-5 relevant tags for the blog post"
+                    }
+                  },
+                  required: ["title", "metaTitle", "metaDescription", "focusKeyword", "secondaryKeywords", "excerpt", "content", "tags"],
+                  additionalProperties: false
+                }
+              }
+            }
+          ],
+          tool_choice: { type: "function", function: { name: "create_blog_post" } }
         }),
       });
     } catch (fetchError) {
@@ -216,52 +207,40 @@ Required JSON structure:
       );
     }
 
-    let content = data.choices[0].message.content;
+    const message = data.choices[0].message;
     
-    console.log('Raw AI response length:', content.length);
-    console.log('First 200 chars:', content.substring(0, 200));
-    
-    // Try to extract JSON from markdown code blocks if present
-    const jsonBlockMatch = content.match(/```(?:json)?\s*(\{[\s\S]*\})\s*```/);
-    if (jsonBlockMatch) {
-      console.log('Extracted JSON from code block');
-      content = jsonBlockMatch[1];
+    // Extract tool call response
+    if (!message.tool_calls || message.tool_calls.length === 0) {
+      console.error('No tool calls in response:', JSON.stringify(message));
+      return new Response(
+        JSON.stringify({ error: 'AI did not return structured blog data' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
-    
-    // Try to find JSON object in the content
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      content = jsonMatch[0];
+
+    const toolCall = message.tool_calls[0];
+    if (toolCall.function.name !== 'create_blog_post') {
+      console.error('Unexpected tool call:', toolCall.function.name);
+      return new Response(
+        JSON.stringify({ error: 'Unexpected AI response structure' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
-    
+
     let blogData;
     try {
-      blogData = JSON.parse(content);
-      console.log('Successfully parsed JSON on first attempt');
+      blogData = JSON.parse(toolCall.function.arguments);
+      console.log('Successfully extracted blog data from tool call');
     } catch (parseError) {
-      console.error('JSON parse error:', parseError);
-      console.error('Content that failed to parse:', content.substring(0, 1000));
-      
-      // Try to fix common JSON issues
-      try {
-        let fixedContent = content
-          .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Remove control characters
-          .replace(/,(\s*[}\]])/g, '$1') // Remove trailing commas
-          .trim();
-        
-        blogData = JSON.parse(fixedContent);
-        console.log('Successfully parsed after fixes');
-      } catch (secondError) {
-        console.error('Still failed after fixes:', secondError);
-        const errorMsg = parseError instanceof Error ? parseError.message : 'Unknown parse error';
-        return new Response(
-          JSON.stringify({ 
-            error: `Failed to parse AI response: ${errorMsg}`,
-            details: content.substring(0, 500)
-          }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
+      console.error('Failed to parse tool call arguments:', parseError);
+      console.error('Arguments:', toolCall.function.arguments.substring(0, 500));
+      return new Response(
+        JSON.stringify({ 
+          error: 'Failed to parse AI response data',
+          details: parseError instanceof Error ? parseError.message : 'Unknown error'
+        }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Validate required fields
