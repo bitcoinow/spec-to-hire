@@ -112,6 +112,9 @@ const Pricing = () => {
               src={logo} 
               alt="Spec2Hire Logo" 
               className="w-8 h-8 rounded-lg"
+              width="32"
+              height="32"
+              loading="lazy"
             />
             <span className="font-semibold text-foreground">Spec2Hire</span>
           </Link>

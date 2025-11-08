@@ -361,6 +361,7 @@ const BlogAdmin = () => {
                             src={url}
                             alt={`Blog preview ${idx + 1}`}
                             className="w-20 h-20 object-cover rounded border"
+                            loading="lazy"
                           />
                         ))}
                       </div>

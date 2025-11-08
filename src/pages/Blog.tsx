@@ -42,7 +42,14 @@ const Blog = () => {
         <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between max-w-7xl">
             <Link to="/" className="flex items-center gap-3">
-              <img src={logo} alt="Spec2Hire Logo" className="w-10 h-10 rounded-lg" />
+              <img 
+                src={logo} 
+                alt="Spec2Hire Logo" 
+                className="w-10 h-10 rounded-lg"
+                width="40"
+                height="40"
+                loading="lazy"
+              />
               <div>
                 <h1 className="font-bold text-lg">Spec2Hire</h1>
                 <p className="text-xs text-muted-foreground">Blog</p>
@@ -79,6 +86,8 @@ const Blog = () => {
                     src={selectedPost.image_url} 
                     alt={selectedPost.title}
                     className="w-full h-full object-cover"
+                    loading="eager"
+                    fetchPriority="high"
                   />
                 </div>
               )}
@@ -150,7 +159,14 @@ const Blog = () => {
       <nav className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between max-w-7xl">
           <Link to="/" className="flex items-center gap-3">
-            <img src={logo} alt="Spec2Hire Logo" className="w-10 h-10 rounded-lg" />
+            <img 
+              src={logo} 
+              alt="Spec2Hire Logo" 
+              className="w-10 h-10 rounded-lg"
+              width="40"
+              height="40"
+              loading="lazy"
+            />
             <div>
               <h1 className="font-bold text-lg">Spec2Hire</h1>
               <p className="text-xs text-muted-foreground">Blog</p>
@@ -197,6 +213,7 @@ const Blog = () => {
                       src={post.image_url} 
                       alt={post.title}
                       className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                      loading="lazy"
                     />
                   </div>
                 )}

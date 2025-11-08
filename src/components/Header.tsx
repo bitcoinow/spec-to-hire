@@ -67,6 +67,9 @@ export const Header = () => {
             src={logo} 
             alt="Spec2Hire Logo" 
             className="w-10 h-10 rounded-lg"
+            width="40"
+            height="40"
+            loading="eager"
           />
           <div>
             <h1 className="font-bold text-lg">Spec2Hire</h1>

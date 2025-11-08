@@ -30,6 +30,8 @@ const Landing = () => {
               className="w-8 h-8 rounded-lg"
               width="32"
               height="32"
+              loading="eager"
+              fetchPriority="high"
             />
             <span className="font-semibold text-foreground">Spec2Hire</span>
           </Link>
@@ -61,7 +63,7 @@ const Landing = () => {
           <div className="container mx-auto px-4 py-16 max-w-6xl">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div>
-                <h1 id="hero-heading" className="text-4xl md:text-5xl font-bold tracking-tight leading-[1.1]">
+                <h1 id="hero-heading" className="text-4xl md:text-5xl font-bold tracking-tight leading-[1.1]" style={{ contentVisibility: 'auto' }}>
                   ATS-friendly CV & cover letter in <span className="font-display">60 seconds</span>
                 </h1>
                 <p className="mt-4 text-base md:text-lg text-muted-foreground leading-relaxed">
