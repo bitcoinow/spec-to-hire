@@ -43,10 +43,10 @@ All colors MUST be HSL.
     --sidebar-border: 0 0% 90%;
     --sidebar-ring: 0 0% 60%;
     
-    /* Card hover colors for light mode */
-    --card-hover-1: 220 100% 97%;
-    --card-hover-2: 142 76% 96%;
-    --card-hover-3: 280 100% 97%;
+    /* Card hover colors for light mode - more visible */
+    --card-hover-1: 220 95% 92%;
+    --card-hover-2: 142 70% 92%;
+    --card-hover-3: 280 90% 92%;
   }
 
   .dark {
@@ -149,21 +149,24 @@ All colors MUST be HSL.
   
   /* Card hover effects for light mode only */
   .hover-card-1:hover {
-    background-color: hsl(var(--card-hover-1));
+    background-color: hsl(var(--card-hover-1)) !important;
+    transition: background-color 0.3s ease, transform 0.3s ease;
   }
   
   .hover-card-2:hover {
-    background-color: hsl(var(--card-hover-2));
+    background-color: hsl(var(--card-hover-2)) !important;
+    transition: background-color 0.3s ease, transform 0.3s ease;
   }
   
   .hover-card-3:hover {
-    background-color: hsl(var(--card-hover-3));
+    background-color: hsl(var(--card-hover-3)) !important;
+    transition: background-color 0.3s ease, transform 0.3s ease;
   }
   
   /* Disable hover colors in dark mode */
   .dark .hover-card-1:hover,
   .dark .hover-card-2:hover,
   .dark .hover-card-3:hover {
-    background-color: hsl(var(--card));
+    background-color: hsl(var(--card)) !important;
   }
 }
