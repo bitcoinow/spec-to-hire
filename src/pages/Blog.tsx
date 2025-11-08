@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import ReactMarkdown from "react-markdown";
 import logo from "@/assets/spec2hire-logo.png";
+import { AdSpace } from "@/components/AdSpace";
 
 const Blog = () => {
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
@@ -83,6 +84,11 @@ const Blog = () => {
               )}
             </div>
 
+            {/* Ad Space - Top of Content */}
+            <div className="my-8">
+              <AdSpace slot="1234567890" format="horizontal" />
+            </div>
+
             <div className="text-foreground blog-content">
               <ReactMarkdown
                 components={{
@@ -96,6 +102,11 @@ const Blog = () => {
               >
                 {selectedPost.content}
               </ReactMarkdown>
+            </div>
+
+            {/* Ad Space - After Content */}
+            <div className="my-8">
+              <AdSpace slot="0987654321" format="horizontal" />
             </div>
 
             {selectedPost.job_site_url && (
@@ -159,6 +170,11 @@ const Blog = () => {
           </p>
         </div>
 
+        {/* Ad Space - Top of Blog List */}
+        <div className="mb-8">
+          <AdSpace slot="1122334455" format="horizontal" />
+        </div>
+
         {loading ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">Loading blog posts...</p>
@@ -200,6 +216,13 @@ const Blog = () => {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        )}
+
+        {/* Ad Space - Bottom of Blog List */}
+        {!loading && blogPosts.length > 0 && (
+          <div className="mt-8">
+            <AdSpace slot="5544332211" format="horizontal" />
           </div>
         )}
       </div>
