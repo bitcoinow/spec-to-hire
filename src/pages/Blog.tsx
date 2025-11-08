@@ -61,20 +61,41 @@ const Blog = () => {
           </Button>
 
           <article className="prose prose-lg dark:prose-invert max-w-none">
-            <div className="mb-6">
+            <div className="mb-8">
               <Badge className="mb-4">{selectedPost.category}</Badge>
-              <h1 className="text-4xl font-bold mb-4 text-foreground">{selectedPost.title}</h1>
-              <p className="text-muted-foreground">
+              <h1 className="text-4xl font-bold mb-4 text-foreground leading-tight">{selectedPost.title}</h1>
+              <p className="text-muted-foreground mb-6">
                 {new Date(selectedPost.created_at).toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "long",
                   day: "numeric",
                 })}
               </p>
+              
+              {selectedPost.image_url && (
+                <div className="w-full h-64 md:h-96 overflow-hidden rounded-lg mb-8">
+                  <img 
+                    src={selectedPost.image_url} 
+                    alt={selectedPost.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
             </div>
 
-            <div className="text-foreground">
-              <ReactMarkdown>{selectedPost.content}</ReactMarkdown>
+            <div className="text-foreground blog-content">
+              <ReactMarkdown
+                components={{
+                  h2: ({node, ...props}) => <h2 className="text-2xl font-bold mt-8 mb-4 text-foreground" {...props} />,
+                  h3: ({node, ...props}) => <h3 className="text-xl font-semibold mt-6 mb-3 text-foreground" {...props} />,
+                  p: ({node, ...props}) => <p className="mb-4 leading-relaxed text-foreground" {...props} />,
+                  ul: ({node, ...props}) => <ul className="mb-4 ml-6 space-y-2" {...props} />,
+                  ol: ({node, ...props}) => <ol className="mb-4 ml-6 space-y-2" {...props} />,
+                  li: ({node, ...props}) => <li className="leading-relaxed" {...props} />,
+                }}
+              >
+                {selectedPost.content}
+              </ReactMarkdown>
             </div>
 
             {selectedPost.job_site_url && (
@@ -151,13 +172,22 @@ const Blog = () => {
             {blogPosts.map((post) => (
               <Card
                 key={post.id}
-                className="cursor-pointer hover:border-primary transition-colors bg-card"
+                className="cursor-pointer hover:border-primary transition-all duration-300 hover:shadow-lg bg-card overflow-hidden"
                 onClick={() => setSelectedPost(post)}
               >
+                {post.image_url && (
+                  <div className="w-full h-48 overflow-hidden">
+                    <img 
+                      src={post.image_url} 
+                      alt={post.title}
+                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                    />
+                  </div>
+                )}
                 <CardHeader>
                   <Badge className="w-fit mb-2">{post.category}</Badge>
-                  <CardTitle className="text-card-foreground">{post.title}</CardTitle>
-                  <CardDescription className="text-card-foreground/70">{post.excerpt}</CardDescription>
+                  <CardTitle className="text-card-foreground line-clamp-2">{post.title}</CardTitle>
+                  <CardDescription className="text-card-foreground/70 line-clamp-3">{post.excerpt}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">

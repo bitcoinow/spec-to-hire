@@ -86,9 +86,48 @@ serve(async (req) => {
 
     console.log('Generating blog post for topic:', topic);
 
-    const systemPrompt = `You are an expert SEO content writer specializing in job market news and career advice. Generate comprehensive blog posts with proper SEO optimization.`;
+    const systemPrompt = `You are an expert SEO content writer specializing in job market news and career advice. Generate comprehensive blog posts with proper SEO optimization and clear structure.`;
 
-    const userPrompt = `Write a blog post about: ${topic}${jobSiteUrl ? `\n\nInclude information relevant to job seekers using ${jobSiteUrl}` : ''}`;
+    const userPrompt = `Write a detailed blog post about: ${topic}${jobSiteUrl ? `\n\nInclude information relevant to job seekers using ${jobSiteUrl}` : ''}
+    
+Important formatting requirements:
+- Use proper markdown structure with clear heading hierarchy
+- Add blank lines between paragraphs for readability
+- Structure content with engaging subheadings
+- Include a comprehensive FAQ section with 5-7 relevant questions
+- Write in a conversational, engaging tone while maintaining professionalism`;
+
+    // Generate a featured image using AI
+    let imageUrl = '';
+    try {
+      const imagePrompt = `Professional blog header image for: ${topic}. Style: modern, clean, professional, relevant to job search and career development. High quality, suitable for web use.`;
+      
+      const imageResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash-image-preview',
+          messages: [
+            { role: 'user', content: imagePrompt }
+          ],
+          modalities: ["image", "text"]
+        }),
+      });
+
+      if (imageResponse.ok) {
+        const imageData = await imageResponse.json();
+        imageUrl = imageData.choices?.[0]?.message?.images?.[0]?.image_url?.url || '';
+        console.log('Blog image generated successfully');
+      } else {
+        console.warn('Failed to generate blog image, continuing without it');
+      }
+    } catch (imageError) {
+      console.error('Image generation error:', imageError);
+      // Continue without image
+    }
 
     let response;
     try {
@@ -140,7 +179,7 @@ serve(async (req) => {
                     },
                     content: {
                       type: "string",
-                      description: "Full markdown content (800-1200 words). Use ## for H2, ### for H3. Include engaging hook, 3-5 main sections, FAQ section with 3-5 questions, and clear conclusion with CTA. Use bullet points, bold text, maintain 2-4 sentence paragraphs."
+                      description: "Full markdown content (1000-1500 words). CRITICAL FORMATTING: Use ## for main H2 headings, ### for H3 subheadings. Add blank lines (\\n\\n) between ALL paragraphs and after headings. Structure: 1) Engaging introduction (2-3 paragraphs), 2) 4-6 main sections with ## headings, 3) FAQ section (## Frequently Asked Questions) with 5-7 Q&A pairs formatted as ### for questions, 4) Conclusion with CTA. Use bullet points with proper spacing, **bold** for emphasis, maintain 2-4 sentence paragraphs with blank lines between them."
                     },
                     tags: {
                       type: "array",
@@ -270,7 +309,8 @@ serve(async (req) => {
         content: blogData.content,
         tags: blogData.tags || [],
         category: category || 'job_news',
-        jobSiteUrl: jobSiteUrl || null
+        jobSiteUrl: jobSiteUrl || null,
+        imageUrl: imageUrl || null
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
