@@ -7,10 +7,16 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Sparkles, Trash2 } from "lucide-react";
+import { Loader2, Sparkles, Trash2, Calendar as CalendarIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Switch } from "@/components/ui/switch";
+import { BlogCalendar } from "@/components/BlogCalendar";
+import { BlogAutomationSettings } from "@/components/BlogAutomationSettings";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
 
 const BlogAdmin = () => {
   const [user, setUser] = useState<any>(null);
@@ -21,6 +27,8 @@ const BlogAdmin = () => {
   const [jobSiteUrl, setJobSiteUrl] = useState("");
   const [generatedBlog, setGeneratedBlog] = useState<any>(null);
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
+  const [scheduledDate, setScheduledDate] = useState<Date | undefined>();
+  const [showSchedulePicker, setShowSchedulePicker] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -107,10 +115,12 @@ const BlogAdmin = () => {
     }
   };
 
-  const saveBlog = async (published: boolean) => {
+  const saveBlog = async (published: boolean, scheduleDate?: Date) => {
     if (!generatedBlog) return;
 
     try {
+      const status = scheduleDate ? 'scheduled' : (published ? 'published' : 'draft');
+      
       const { error } = await supabase.from("blog_posts").insert({
         title: generatedBlog.title,
         slug: generatedBlog.slug,
@@ -121,26 +131,61 @@ const BlogAdmin = () => {
         job_site_url: generatedBlog.jobSiteUrl,
         image_url: generatedBlog.imageUrl || (generatedBlog.imageUrls?.[0] || null),
         image_urls: generatedBlog.imageUrls || null,
-        published,
+        published: published && !scheduleDate,
+        status,
+        scheduled_at: scheduleDate?.toISOString() || null,
         author_id: user?.id,
       });
 
       if (error) throw error;
 
       toast({
-        title: published ? "Blog published!" : "Blog saved as draft",
-        description: "Blog post saved successfully",
+        title: scheduleDate ? "Blog scheduled!" : (published ? "Blog published!" : "Blog saved as draft"),
+        description: scheduleDate 
+          ? `Blog post scheduled for ${format(scheduleDate, "PPP 'at' p")}`
+          : "Blog post saved successfully",
       });
 
       setGeneratedBlog(null);
       setTopic("");
       setJobSiteUrl("");
+      setScheduledDate(undefined);
       loadBlogPosts();
     } catch (error: any) {
       console.error("Error saving blog:", error);
       toast({
         title: "Save failed",
         description: error.message || "Failed to save blog post",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const scheduleExistingPost = async (postId: string, date: Date) => {
+    try {
+      const { error } = await supabase
+        .from("blog_posts")
+        .update({ 
+          scheduled_at: date.toISOString(),
+          status: 'scheduled',
+          published: false
+        })
+        .eq("id", postId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Post scheduled",
+        description: `Scheduled for ${format(date, "PPP 'at' p")}`,
+      });
+      
+      setShowSchedulePicker(null);
+      loadBlogPosts();
+    } catch (error: any) {
+      console.error("Error scheduling post:", error);
+      toast({
+        title: "Scheduling failed",
+        description: error.message || "Failed to schedule post",
         variant: "destructive",
       });
     }
@@ -228,10 +273,18 @@ const BlogAdmin = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
         <h1 className="text-4xl font-bold mb-8 text-foreground">Blog Admin</h1>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <Tabs defaultValue="generate" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3 max-w-md">
+            <TabsTrigger value="generate">Generate</TabsTrigger>
+            <TabsTrigger value="schedule">Schedule</TabsTrigger>
+            <TabsTrigger value="automation">Automation</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="generate" className="space-y-6">
+            <div className="grid lg:grid-cols-2 gap-8">
           {/* Generation Panel */}
           <Card className="bg-card">
             <CardHeader>
@@ -313,11 +366,30 @@ const BlogAdmin = () => {
                       </div>
                     </div>
                   )}
-                  <div className="flex gap-2">
-                    <Button onClick={() => saveBlog(false)} variant="outline">
+                  <div className="flex gap-2 flex-wrap">
+                    <Button onClick={() => saveBlog(false)} variant="outline" size="sm">
                       Save as Draft
                     </Button>
-                    <Button onClick={() => saveBlog(true)}>Publish</Button>
+                    <Button onClick={() => saveBlog(true)} size="sm">Publish Now</Button>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="secondary" size="sm">
+                          <CalendarIcon className="w-4 h-4 mr-2" />
+                          Schedule
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          selected={scheduledDate}
+                          onSelect={(date) => {
+                            setScheduledDate(date);
+                            if (date) saveBlog(false, date);
+                          }}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
                   </div>
                 </div>
               )}
@@ -352,7 +424,7 @@ const BlogAdmin = () => {
                             </p>
                           )}
                         </div>
-                        <div className="flex gap-2 items-center">
+                        <div className="flex gap-2 items-center flex-wrap">
                           {(!post.image_urls || post.image_urls.length === 0) && (
                             <Button
                               size="sm"
@@ -362,6 +434,22 @@ const BlogAdmin = () => {
                             >
                               <Sparkles className="w-4 h-4" />
                             </Button>
+                          )}
+                          {post.status === 'draft' && (
+                            <Popover open={showSchedulePicker === post.id} onOpenChange={(open) => setShowSchedulePicker(open ? post.id : null)}>
+                              <PopoverTrigger asChild>
+                                <Button size="sm" variant="outline">
+                                  <CalendarIcon className="w-4 h-4" />
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                  mode="single"
+                                  onSelect={(date) => date && scheduleExistingPost(post.id, date)}
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
                           )}
                           <Switch
                             checked={post.published}
@@ -382,7 +470,22 @@ const BlogAdmin = () => {
               </div>
             </CardContent>
           </Card>
-        </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="schedule">
+            <BlogCalendar 
+              posts={blogPosts} 
+              onDateSelect={(date) => console.log('Selected date:', date)} 
+            />
+          </TabsContent>
+
+          <TabsContent value="automation">
+            <div className="max-w-2xl mx-auto">
+              <BlogAutomationSettings />
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

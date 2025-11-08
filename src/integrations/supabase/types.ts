@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      blog_automation_settings: {
+        Row: {
+          auto_publish: boolean | null
+          categories: string[] | null
+          created_at: string | null
+          enabled: boolean | null
+          frequency: string | null
+          id: string
+          last_generated_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          auto_publish?: boolean | null
+          categories?: string[] | null
+          created_at?: string | null
+          enabled?: boolean | null
+          frequency?: string | null
+          id?: string
+          last_generated_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          auto_publish?: boolean | null
+          categories?: string[] | null
+          created_at?: string | null
+          enabled?: boolean | null
+          frequency?: string | null
+          id?: string
+          last_generated_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           author_id: string | null
@@ -26,7 +59,9 @@ export type Database = {
           image_urls: string[] | null
           job_site_url: string | null
           published: boolean | null
+          scheduled_at: string | null
           slug: string
+          status: string | null
           tags: string[] | null
           title: string
           updated_at: string | null
@@ -42,7 +77,9 @@ export type Database = {
           image_urls?: string[] | null
           job_site_url?: string | null
           published?: boolean | null
+          scheduled_at?: string | null
           slug: string
+          status?: string | null
           tags?: string[] | null
           title: string
           updated_at?: string | null
@@ -58,7 +95,9 @@ export type Database = {
           image_urls?: string[] | null
           job_site_url?: string | null
           published?: boolean | null
+          scheduled_at?: string | null
           slug?: string
+          status?: string | null
           tags?: string[] | null
           title?: string
           updated_at?: string | null
