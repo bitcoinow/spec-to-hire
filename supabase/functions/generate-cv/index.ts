@@ -7,21 +7,13 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  console.log('=== GENERATE-CV REQUEST RECEIVED ===');
-  console.log('Method:', req.method);
-  console.log('URL:', req.url);
-  
   if (req.method === 'OPTIONS') {
-    console.log('Handling OPTIONS request');
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    console.log('Starting request processing...');
-    
     // Authenticate user with service role
     const authHeader = req.headers.get('Authorization');
-    console.log('Auth header present:', !!authHeader);
     
     if (!authHeader) {
       return new Response(
@@ -41,20 +33,16 @@ serve(async (req) => {
     
     // Verify the JWT token
     const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(jwt);
-    console.log('User auth result:', { userId: user?.id, hasError: !!authError });
     
     if (authError || !user) {
-      console.error('Auth error details:', authError);
+      console.error('Authentication failed');
       return new Response(
         JSON.stringify({ error: 'Unauthorized', details: authError?.message }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log('Parsing request body...');
     const requestData = await req.json();
-    console.log('Request data keys:', Object.keys(requestData));
-    
     const { jobSpec, masterProfile } = requestData;
     
     // Input validation
@@ -91,9 +79,7 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    console.log('Processing CV generation request...');
-    console.log('Job spec length:', jobSpec.length);
-    console.log('Master profile keys:', Object.keys(masterProfile));
+    console.log('Processing CV generation request');
 
     // System prompt for the AI
     const systemPrompt = `You are an ATS coach. Given (A) Job Description and (B) Candidate Profile JSON:
@@ -155,8 +141,6 @@ CRITICAL: Return JSON with this exact structure:
   "cover_letter": "string"
 }`;
 
-    console.log('Calling Lovable AI Gateway...');
-    
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -200,16 +184,12 @@ CRITICAL: Return JSON with this exact structure:
     }
 
     const data = await response.json();
-    console.log('AI response received, has choices:', !!data.choices);
-    
     const content = data.choices?.[0]?.message?.content;
 
     if (!content) {
-      console.error('No content in AI response. Data:', JSON.stringify(data));
+      console.error('No content in AI response');
       throw new Error('No content in AI response');
     }
-
-    console.log('Content length:', content.length);
 
     // Parse the AI response - it should be JSON
     let result;
@@ -222,8 +202,7 @@ CRITICAL: Return JSON with this exact structure:
         result = JSON.parse(content);
       }
     } catch (parseError) {
-      console.error('Failed to parse AI response:', parseError);
-      console.error('Content that failed to parse:', content.substring(0, 500));
+      console.error('Failed to parse AI response');
       // If parsing fails, create a structured response from the text
       result = {
         parsed_job: {
