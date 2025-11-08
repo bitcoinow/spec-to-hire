@@ -119,7 +119,8 @@ const BlogAdmin = () => {
         tags: generatedBlog.tags,
         category: generatedBlog.category,
         job_site_url: generatedBlog.jobSiteUrl,
-        image_url: generatedBlog.imageUrl,
+        image_url: generatedBlog.imageUrl || (generatedBlog.imageUrls?.[0] || null),
+        image_urls: generatedBlog.imageUrls || null,
         published,
         author_id: user?.id,
       });
@@ -269,6 +270,23 @@ const BlogAdmin = () => {
                 <div className="mt-6 space-y-4 p-4 border rounded-lg bg-muted/50">
                   <h3 className="font-semibold text-lg text-foreground">{generatedBlog.title}</h3>
                   <p className="text-sm text-muted-foreground">{generatedBlog.excerpt}</p>
+                  {generatedBlog.imageUrls && generatedBlog.imageUrls.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-xs text-muted-foreground">
+                        {generatedBlog.imageUrls.length} image{generatedBlog.imageUrls.length > 1 ? 's' : ''} generated
+                      </p>
+                      <div className="flex gap-2 flex-wrap">
+                        {generatedBlog.imageUrls.slice(0, 3).map((url: string, idx: number) => (
+                          <img
+                            key={idx}
+                            src={url}
+                            alt={`Blog preview ${idx + 1}`}
+                            className="w-20 h-20 object-cover rounded border"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   <div className="flex gap-2">
                     <Button onClick={() => saveBlog(false)} variant="outline">
                       Save as Draft

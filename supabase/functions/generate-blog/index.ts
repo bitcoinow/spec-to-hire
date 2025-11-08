@@ -97,37 +97,47 @@ Important formatting requirements:
 - Include a comprehensive FAQ section with 5-7 relevant questions
 - Write in a conversational, engaging tone while maintaining professionalism`;
 
-    // Generate a featured image using AI
-    let imageUrl = '';
-    try {
-      const imagePrompt = `Professional blog header image for: ${topic}. Style: modern, clean, professional, relevant to job search and career development. High quality, suitable for web use.`;
-      
-      const imageResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'google/gemini-2.5-flash-image-preview',
-          messages: [
-            { role: 'user', content: imagePrompt }
-          ],
-          modalities: ["image", "text"]
-        }),
-      });
+    // Generate multiple images using AI (at least 3)
+    const imageUrls: string[] = [];
+    const imagePrompts = [
+      `Professional blog header image for: ${topic}. Style: modern, clean, professional, relevant to job search and career development. High quality, suitable for web use.`,
+      `Infographic style illustration about: ${topic}. Clean design, professional, suitable for blog content.`,
+      `Professional workplace or career-related image for: ${topic}. Modern style, high quality.`
+    ];
 
-      if (imageResponse.ok) {
-        const imageData = await imageResponse.json();
-        imageUrl = imageData.choices?.[0]?.message?.images?.[0]?.image_url?.url || '';
-        console.log('Blog image generated successfully');
-      } else {
-        console.warn('Failed to generate blog image, continuing without it');
+    for (const imagePrompt of imagePrompts) {
+      try {
+        const imageResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'google/gemini-2.5-flash-image-preview',
+            messages: [
+              { role: 'user', content: imagePrompt }
+            ],
+            modalities: ["image", "text"]
+          }),
+        });
+
+        if (imageResponse.ok) {
+          const imageData = await imageResponse.json();
+          const url = imageData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+          if (url) {
+            imageUrls.push(url);
+            console.log(`Blog image ${imageUrls.length} generated successfully`);
+          }
+        } else {
+          console.warn(`Failed to generate blog image ${imageUrls.length + 1}`);
+        }
+      } catch (imageError) {
+        console.error(`Image generation error for image ${imageUrls.length + 1}:`, imageError);
       }
-    } catch (imageError) {
-      console.error('Image generation error:', imageError);
-      // Continue without image
     }
+
+    console.log(`Generated ${imageUrls.length} images for blog post`);
 
     let response;
     try {
@@ -310,7 +320,8 @@ Important formatting requirements:
         tags: blogData.tags || [],
         category: category || 'job_news',
         jobSiteUrl: jobSiteUrl || null,
-        imageUrl: imageUrl || null
+        imageUrls: imageUrls.length > 0 ? imageUrls : null,
+        imageUrl: imageUrls.length > 0 ? imageUrls[0] : null // Backward compatibility
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

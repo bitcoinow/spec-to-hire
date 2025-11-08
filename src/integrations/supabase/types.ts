@@ -23,6 +23,7 @@ export type Database = {
           excerpt: string
           id: string
           image_url: string | null
+          image_urls: string[] | null
           job_site_url: string | null
           published: boolean | null
           slug: string
@@ -38,6 +39,7 @@ export type Database = {
           excerpt: string
           id?: string
           image_url?: string | null
+          image_urls?: string[] | null
           job_site_url?: string | null
           published?: boolean | null
           slug: string
@@ -53,6 +55,7 @@ export type Database = {
           excerpt?: string
           id?: string
           image_url?: string | null
+          image_urls?: string[] | null
           job_site_url?: string | null
           published?: boolean | null
           slug?: string
