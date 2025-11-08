@@ -190,6 +190,32 @@ const BlogAdmin = () => {
     }
   };
 
+  const generateImagesForPost = async (id: string, title: string) => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-blog-images", {
+        body: { blogId: id },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Images generated!",
+        description: `Generated ${data.imageUrls?.length || 0} images for "${title}"`,
+      });
+      loadBlogPosts();
+    } catch (error: any) {
+      console.error("Error generating images:", error);
+      toast({
+        title: "Generation failed",
+        description: error.message || "Failed to generate images",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading || !isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -318,8 +344,25 @@ const BlogAdmin = () => {
                         <div className="flex-1">
                           <h4 className="font-semibold text-foreground">{post.title}</h4>
                           <p className="text-sm text-muted-foreground">{post.category}</p>
+                          {!post.image_urls || post.image_urls.length === 0 ? (
+                            <p className="text-xs text-orange-500 mt-1">No images</p>
+                          ) : (
+                            <p className="text-xs text-green-600 mt-1">
+                              {post.image_urls.length} image{post.image_urls.length > 1 ? 's' : ''}
+                            </p>
+                          )}
                         </div>
                         <div className="flex gap-2 items-center">
+                          {(!post.image_urls || post.image_urls.length === 0) && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => generateImagesForPost(post.id, post.title)}
+                              disabled={loading}
+                            >
+                              <Sparkles className="w-4 h-4" />
+                            </Button>
+                          )}
                           <Switch
                             checked={post.published}
                             onCheckedChange={() => togglePublish(post.id, post.published)}

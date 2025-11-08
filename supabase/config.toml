@@ -12,5 +12,7 @@ project_id = "mggtjhyvmfjlcxjauqvt"
 
 [functions.generate-blog]
 
+[functions.generate-blog-images]
+
 [functions.submit-waitlist]
 verify_jwt = false
