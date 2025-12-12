@@ -165,7 +165,7 @@ const Landing = () => {
         </Card>
 
           {/* Testimonials */}
-          <section className="mb-20" aria-labelledby="testimonials-heading">
+          <section className="mt-24 mb-20" aria-labelledby="testimonials-heading">
             <h2 id="testimonials-heading" className="text-4xl font-bold tracking-tight text-center mb-12 text-foreground">What Our Users Say</h2>
             
             <div className="grid md:grid-cols-3 gap-6">
