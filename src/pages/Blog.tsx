@@ -4,20 +4,48 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ExternalLink } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import ReactMarkdown from "react-markdown";
 import logo from "@/assets/spec2hire-logo.png";
 import { AdSpace } from "@/components/AdSpace";
 
 const Blog = () => {
+  const { slug } = useParams();
+  const navigate = useNavigate();
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
   const [selectedPost, setSelectedPost] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadBlogPosts();
-  }, []);
+    if (slug) {
+      loadPostBySlug(slug);
+    } else {
+      loadBlogPosts();
+    }
+  }, [slug]);
+
+  const loadPostBySlug = async (postSlug: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("blog_posts")
+        .select("*")
+        .eq("slug", postSlug)
+        .eq("published", true)
+        .single();
+
+      if (error || !data) {
+        navigate("/blog");
+        return;
+      }
+      setSelectedPost(data);
+    } catch (error) {
+      console.error("Error loading blog post:", error);
+      navigate("/blog");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const loadBlogPosts = async () => {
     try {
@@ -61,7 +89,7 @@ const Blog = () => {
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           <Button
             variant="ghost"
-            onClick={() => setSelectedPost(null)}
+            onClick={() => navigate("/blog")}
             className="mb-6"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -205,7 +233,7 @@ const Blog = () => {
               <Card
                 key={post.id}
                 className="cursor-pointer hover:border-primary transition-all duration-300 hover:shadow-lg bg-card overflow-hidden"
-                onClick={() => setSelectedPost(post)}
+                onClick={() => navigate(`/blog/${post.slug}`)}
               >
                 {post.image_url && (
                   <div className="w-full h-48 overflow-hidden">
