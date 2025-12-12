@@ -220,7 +220,7 @@ Important requirements:
                     },
                     content: {
                       type: "string",
-                      description: "Full markdown content (1000-1500 words). CRITICAL FORMATTING: Use ## for main H2 headings, ### for H3 subheadings. Add blank lines (\\n\\n) between ALL paragraphs and after headings. Structure: 1) Engaging introduction (2-3 paragraphs), 2) 4-6 main sections with ## headings, 3) FAQ section (## Frequently Asked Questions) with 5-7 Q&A pairs formatted as ### for questions, 4) Conclusion with CTA. Use bullet points with proper spacing, **bold** for emphasis, maintain 2-4 sentence paragraphs with blank lines between them."
+                      description: "Full markdown content (2500-3500 words minimum). CRITICAL FORMATTING: Use ## for main H2 headings, ### for H3 subheadings. Add blank lines (\\n\\n) between ALL paragraphs and after headings. Structure: 1) Engaging introduction (3-4 paragraphs with hook and context), 2) 8-10 main sections with ## headings - each section should be 200-300 words with detailed analysis, examples, and actionable insights, 3) Include relevant statistics, expert quotes, and real-world examples, 4) FAQ section (## Frequently Asked Questions) with 8-10 Q&A pairs formatted as ### for questions with detailed answers, 5) Comprehensive conclusion with key takeaways and CTA. Use bullet points with proper spacing, **bold** for emphasis, maintain 3-5 sentence paragraphs with blank lines between them. This should be a comprehensive, in-depth article."
                     },
                     tags: {
                       type: "array",

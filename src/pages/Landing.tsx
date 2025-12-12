@@ -1,15 +1,35 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Sparkles, Shield, Zap, CheckCircle2, Play } from "lucide-react";
+import { Sparkles, Shield, Zap, CheckCircle2, Play, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import logo from "@/assets/spec2hire-logo.png";
 import StructuredData from "@/components/StructuredData";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { supabase } from "@/integrations/supabase/client";
 
 const Landing = () => {
+  const [latestPosts, setLatestPosts] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchLatestPosts = async () => {
+      const { data } = await supabase
+        .from("blog_posts")
+        .select("id, title, slug, excerpt, category, created_at, image_url")
+        .eq("published", true)
+        .order("created_at", { ascending: false })
+        .limit(3);
+      
+      if (data) setLatestPosts(data);
+    };
+    fetchLatestPosts();
+  }, []);
+
   const scrollToDemo = () => {
     document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  const formatCategory = (cat: string) => cat?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
   return (
     <>
@@ -178,6 +198,68 @@ const Landing = () => {
               <div className="text-2xl font-bold text-foreground">Apple</div>
             </div>
           </section>
+
+        {/* Latest News & Insights */}
+        {latestPosts.length > 0 && (
+          <section className="container mx-auto px-4 py-16 max-w-6xl" aria-labelledby="news-heading">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 id="news-heading" className="text-3xl font-bold tracking-tight text-foreground">Latest News & Insights</h2>
+                <p className="text-muted-foreground mt-2">Stay updated with job market trends, AI, and career tips</p>
+              </div>
+              <Link 
+                to="/blog" 
+                className="hidden md:inline-flex items-center gap-2 text-primary hover:underline font-medium"
+              >
+                View all articles <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+            
+            <div className="grid md:grid-cols-3 gap-6">
+              {latestPosts.map((post, i) => (
+                <Link key={post.id} to={`/blog/${post.slug}`}>
+                  <Card className={`h-full overflow-hidden hover:shadow-lg transition-all duration-300 group hover-card-${i + 1}`}>
+                    {post.image_url && (
+                      <div className="aspect-video overflow-hidden">
+                        <img 
+                          src={post.image_url} 
+                          alt={post.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                        />
+                      </div>
+                    )}
+                    <CardContent className="p-5">
+                      <span className="text-xs font-medium text-primary uppercase tracking-wide">
+                        {formatCategory(post.category)}
+                      </span>
+                      <h3 className="font-semibold text-lg mt-2 mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                        {post.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground line-clamp-2">{post.excerpt}</p>
+                      <p className="text-xs text-muted-foreground mt-3">
+                        {new Date(post.created_at).toLocaleDateString('en-US', { 
+                          month: 'short', 
+                          day: 'numeric', 
+                          year: 'numeric' 
+                        })}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+
+            <div className="mt-6 text-center md:hidden">
+              <Link 
+                to="/blog" 
+                className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
+              >
+                View all articles <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </section>
+        )}
 
         {/* CTA Section */}
         <section className="container mx-auto px-4 pb-24 max-w-3xl text-center" aria-labelledby="cta-heading">
