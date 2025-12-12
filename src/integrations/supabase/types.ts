@@ -222,6 +222,7 @@ export type Database = {
           education: Json | null
           experience_snippets: Json
           id: string
+          photo_url: string | null
           skills: Json
           summary: string
           updated_at: string | null
@@ -234,6 +235,7 @@ export type Database = {
           education?: Json | null
           experience_snippets: Json
           id?: string
+          photo_url?: string | null
           skills: Json
           summary: string
           updated_at?: string | null
@@ -246,6 +248,7 @@ export type Database = {
           education?: Json | null
           experience_snippets?: Json
           id?: string
+          photo_url?: string | null
           skills?: Json
           summary?: string
           updated_at?: string | null

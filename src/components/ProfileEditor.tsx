@@ -1,12 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Save, FileJson, Download, Upload } from "lucide-react";
+import { User, Save, FileJson, Download, Upload, Camera, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import type { MasterProfile } from "@/pages/Index";
 import { Input } from "@/components/ui/input";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface ProfileEditorProps {
   profile: MasterProfile | null;
@@ -68,6 +69,9 @@ export const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) 
   );
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const photoInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -99,14 +103,118 @@ export const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) 
           experience_snippets: data.experience_snippets as any,
           education: data.education as any,
           certifications: data.certifications as any,
+          photo_url: (data as any).photo_url || null,
         };
         setJsonText(JSON.stringify(loadedProfile, null, 2));
+        setPhotoUrl((data as any).photo_url || null);
         onProfileChange(loadedProfile);
       }
     } catch (error) {
       console.error('Error loading profile:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid file",
+        description: "Please upload an image file (JPG, PNG, etc.)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Please upload an image smaller than 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsUploadingPhoto(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to upload a photo",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/cv-photo.${fileExt}`;
+
+      // Upload to storage
+      const { error: uploadError } = await supabase.storage
+        .from('cv-photos')
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('cv-photos')
+        .getPublicUrl(fileName);
+
+      // Update profile with photo URL
+      const { error: updateError } = await supabase
+        .from('master_profiles')
+        .update({ photo_url: publicUrl })
+        .eq('user_id', user.id);
+
+      if (updateError) throw updateError;
+
+      setPhotoUrl(publicUrl);
+      toast({
+        title: "Photo uploaded",
+        description: "Your CV photo has been updated",
+      });
+    } catch (error: any) {
+      console.error('Photo upload error:', error);
+      toast({
+        title: "Upload failed",
+        description: error.message || "Failed to upload photo",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploadingPhoto(false);
+    }
+  };
+
+  const handleRemovePhoto = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Update profile to remove photo URL
+      await supabase
+        .from('master_profiles')
+        .update({ photo_url: null })
+        .eq('user_id', user.id);
+
+      setPhotoUrl(null);
+      toast({
+        title: "Photo removed",
+        description: "Your CV photo has been removed",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to remove photo",
+        variant: "destructive",
+      });
     }
   };
 
@@ -254,15 +362,66 @@ export const ProfileEditor = ({ profile, onProfileChange }: ProfileEditorProps) 
     <div className="max-w-4xl mx-auto px-4 sm:px-0">
       <Card className="shadow-xl border-2">
         <CardHeader className="space-y-3 pb-6">
-          <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl">
-            <div className="rounded-lg bg-primary/10 p-2">
-              <User className="w-5 h-5 text-primary" />
+          <div className="flex items-start gap-4">
+            {/* Photo Upload Section */}
+            <div className="relative group">
+              <Avatar className="w-20 h-20 border-2 border-primary/20">
+                {photoUrl ? (
+                  <AvatarImage src={photoUrl} alt="CV Photo" />
+                ) : (
+                  <AvatarFallback className="bg-primary/10">
+                    <User className="w-8 h-8 text-primary/60" />
+                  </AvatarFallback>
+                )}
+              </Avatar>
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  className="h-8 w-8 text-white hover:text-white hover:bg-white/20"
+                  onClick={() => photoInputRef.current?.click()}
+                  disabled={isUploadingPhoto}
+                >
+                  <Camera className="w-4 h-4" />
+                </Button>
+                {photoUrl && (
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    className="h-8 w-8 text-white hover:text-white hover:bg-white/20"
+                    onClick={handleRemovePhoto}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                )}
+              </div>
+              <input
+                ref={photoInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoUpload}
+                className="hidden"
+              />
+              {isUploadingPhoto && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                </div>
+              )}
             </div>
-            Master Profile
-          </CardTitle>
-          <CardDescription className="text-sm sm:text-base">
-            Your single source of truth for all job applications. Edit the JSON below.
-          </CardDescription>
+            <div className="flex-1">
+              <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl">
+                <div className="rounded-lg bg-primary/10 p-2">
+                  <User className="w-5 h-5 text-primary" />
+                </div>
+                Master Profile
+              </CardTitle>
+              <CardDescription className="text-sm sm:text-base mt-2">
+                Your single source of truth for all job applications. Add a photo and edit the JSON below.
+              </CardDescription>
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex flex-wrap gap-2">
