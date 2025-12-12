@@ -51,7 +51,7 @@ const Pricing = () => {
   const plans = [
     {
       name: "Free Trial",
-      price: "£0",
+      price: "$0",
       description: "Try before you buy",
       features: [
         "1 CV generation",
@@ -63,8 +63,8 @@ const Pricing = () => {
       popular: false,
     },
     {
-      name: "Pro",
-      price: "£20",
+      name: "Pro Monthly",
+      price: "$3.99",
       period: "/month",
       description: "For active job seekers",
       features: [
@@ -80,18 +80,17 @@ const Pricing = () => {
       popular: true,
     },
     {
-      name: "One-Time",
-      price: "£5",
-      period: "/CV",
-      description: "Pay as you go",
+      name: "Pro Yearly",
+      price: "$29.99",
+      period: "/year",
+      description: "Best value — save 37%",
       features: [
-        "Single CV generation",
-        "Single cover letter",
-        "ATS-optimized format",
-        "PDF & DOCX export",
-        "Valid for 7 days",
+        "Everything in Pro Monthly",
+        "Priority support",
+        "Early access to new features",
+        "Annual billing discount",
       ],
-      cta: "Buy Credits",
+      cta: "Get Yearly",
       popular: false,
     },
   ];
@@ -100,7 +99,7 @@ const Pricing = () => {
     <>
       <Helmet>
         <title>Pricing — Spec2Hire</title>
-        <meta name="description" content="Choose your plan: Free trial, Pro (£20/month) for unlimited CVs, or pay-as-you-go (£5/CV)." />
+        <meta name="description" content="Choose your plan: Free trial, Pro Monthly ($3.99/month), or Pro Yearly ($29.99/year) for unlimited CVs." />
         <link rel="canonical" href="https://spec-to-hire.lovable.app/pricing" />
       </Helmet>
       <div className="min-h-screen bg-background">
@@ -192,18 +191,15 @@ const Pricing = () => {
                   className="w-full text-sm font-semibold"
                   variant={plan.popular ? "default" : "outline"}
                   onClick={() => {
-                    if (plan.name === "Pro") {
+                    if (plan.name === "Pro Monthly" || plan.name === "Pro Yearly") {
                       handleSubscribe();
-                    } else if (plan.name === "One-Time") {
-                      handleOneTimePayment();
                     } else {
                       navigate('/auth');
                     }
                   }}
                   disabled={loading !== null}
                 >
-                  {loading === "pro" && plan.name === "Pro" ? "Loading..." : 
-                   loading === "onetime" && plan.name === "One-Time" ? "Loading..." : 
+                  {loading === "pro" && (plan.name === "Pro Monthly" || plan.name === "Pro Yearly") ? "Loading..." : 
                    plan.cta}
                 </Button>
               </CardContent>

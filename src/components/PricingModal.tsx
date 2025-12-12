@@ -103,7 +103,7 @@ export const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
                 <CardDescription className="text-sm sm:text-base">For serious job seekers</CardDescription>
               </div>
               <div className="flex items-baseline gap-1">
-                <span className="text-4xl sm:text-5xl font-bold bg-gradient-primary bg-clip-text text-transparent">£20</span>
+                <span className="text-4xl sm:text-5xl font-bold bg-gradient-primary bg-clip-text text-transparent">$3.99</span>
                 <span className="text-sm text-muted-foreground">/month</span>
               </div>
             </CardHeader>
