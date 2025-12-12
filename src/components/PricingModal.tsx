@@ -76,7 +76,7 @@ export const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
             </Label>
             {isYearly && (
               <span className="bg-accent text-accent-foreground text-xs font-semibold px-2 py-0.5 rounded-full">
-                Save 37%
+                Save 49%
               </span>
             )}
           </div>
@@ -137,15 +137,15 @@ export const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
                   {isYearly ? "Pro Yearly" : "Pro Monthly"}
                 </CardTitle>
                 <CardDescription className="text-sm sm:text-base">
-                  {isYearly ? "Best value — save 37%" : "For serious job seekers"}
+                  {isYearly ? "Best value — save 49%" : "For serious job seekers"}
                 </CardDescription>
               </div>
               <div className="flex items-baseline gap-1">
                 {isYearly && (
-                  <span className="text-lg text-muted-foreground line-through mr-2">$47.88</span>
+                  <span className="text-lg text-muted-foreground line-through mr-2">$155.88</span>
                 )}
                 <span className="text-4xl sm:text-5xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                  {isYearly ? "$29.99" : "$3.99"}
+                  {isYearly ? "$79.99" : "$12.99"}
                 </span>
                 <span className="text-sm text-muted-foreground">
                   {isYearly ? "/year" : "/month"}
