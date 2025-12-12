@@ -66,7 +66,7 @@ const Pricing = () => {
     },
     {
       name: "Pro Monthly",
-      price: "$3.99",
+      price: "$12.99",
       period: "/month",
       description: "For active job seekers",
       features: [
@@ -101,10 +101,10 @@ const Pricing = () => {
     },
     {
       name: "Pro Yearly",
-      price: "$29.99",
+      price: "$79.99",
       period: "/year",
-      originalPrice: "$47.88",
-      savings: "Save 37%",
+      originalPrice: "$155.88",
+      savings: "Save 49%",
       description: "Best value for job seekers",
       features: [
         "Everything in Pro Monthly",
@@ -124,7 +124,7 @@ const Pricing = () => {
     <>
       <Helmet>
         <title>Pricing — Spec2Hire</title>
-        <meta name="description" content="Choose your plan: Free trial, Pro Monthly ($3.99/month), or Pro Yearly ($29.99/year) for unlimited CVs." />
+        <meta name="description" content="Choose your plan: Free trial, Pro Monthly ($12.99/month), or Pro Yearly ($79.99/year) for unlimited CVs." />
         <link rel="canonical" href="https://spec-to-hire.lovable.app/pricing" />
       </Helmet>
       <div className="min-h-screen bg-background">
@@ -188,8 +188,8 @@ const Pricing = () => {
                 Yearly
               </Label>
               {isYearly && (
-                <span className="bg-accent text-accent-foreground text-xs font-semibold px-2 py-0.5 rounded-full">
-                  Save 37%
+              <span className="bg-accent text-accent-foreground text-xs font-semibold px-2 py-0.5 rounded-full">
+                  Save 49%
                 </span>
               )}
             </div>
