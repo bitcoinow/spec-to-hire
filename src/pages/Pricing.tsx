@@ -8,16 +8,21 @@ import { useToast } from "@/hooks/use-toast";
 import { Helmet } from "react-helmet-async";
 import { AdSpace } from "@/components/AdSpace";
 import logo from "@/assets/spec2hire-logo.png";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 const Pricing = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState<string | null>(null);
+  const [isYearly, setIsYearly] = useState(false);
 
-  const handleSubscribe = async () => {
-    setLoading("pro");
+  const handleSubscribe = async (billingInterval: "monthly" | "yearly") => {
+    setLoading(billingInterval);
     try {
-      const { data, error } = await supabase.functions.invoke('create-checkout');
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { billingInterval }
+      });
       if (error) throw error;
       if (data?.url) window.open(data.url, '_blank');
     } catch (error: any) {
@@ -31,24 +36,20 @@ const Pricing = () => {
     }
   };
 
-  const handleOneTimePayment = async () => {
-    setLoading("onetime");
-    try {
-      const { data, error } = await supabase.functions.invoke('create-one-time-payment');
-      if (error) throw error;
-      if (data?.url) window.open(data.url, '_blank');
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to start checkout",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(null);
-    }
-  };
+  interface Plan {
+    name: string;
+    price: string;
+    period?: string;
+    originalPrice?: string;
+    savings?: string;
+    description: string;
+    features: string[];
+    cta: string;
+    popular: boolean;
+    action: () => void;
+  }
 
-  const plans = [
+  const monthlyPlans: Plan[] = [
     {
       name: "Free Trial",
       price: "$0",
@@ -61,6 +62,7 @@ const Pricing = () => {
       ],
       cta: "Start Free Trial",
       popular: false,
+      action: () => navigate('/auth'),
     },
     {
       name: "Pro Monthly",
@@ -78,12 +80,32 @@ const Pricing = () => {
       ],
       cta: "Get Started",
       popular: true,
+      action: () => handleSubscribe("monthly"),
+    },
+  ];
+
+  const yearlyPlans: Plan[] = [
+    {
+      name: "Free Trial",
+      price: "$0",
+      description: "Try before you buy",
+      features: [
+        "1 CV generation",
+        "1 cover letter",
+        "ATS-optimized format",
+        "PDF export",
+      ],
+      cta: "Start Free Trial",
+      popular: false,
+      action: () => navigate('/auth'),
     },
     {
       name: "Pro Yearly",
       price: "$29.99",
       period: "/year",
-      description: "Best value — save 37%",
+      originalPrice: "$47.88",
+      savings: "Save 37%",
+      description: "Best value for job seekers",
       features: [
         "Everything in Pro Monthly",
         "Priority support",
@@ -91,9 +113,12 @@ const Pricing = () => {
         "Annual billing discount",
       ],
       cta: "Get Yearly",
-      popular: false,
+      popular: true,
+      action: () => handleSubscribe("yearly"),
     },
   ];
+
+  const plans: Plan[] = isYearly ? yearlyPlans : monthlyPlans;
 
   return (
     <>
@@ -137,14 +162,43 @@ const Pricing = () => {
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-[1.1] mb-4">
             Simple, transparent pricing
           </h1>
-          <p className="text-lg text-muted-foreground leading-relaxed">
+          <p className="text-lg text-muted-foreground leading-relaxed mb-8">
             Choose the plan that works for you. No hidden fees.
           </p>
+
+          {/* Billing Toggle */}
+          <div className="flex items-center justify-center gap-4 mb-8">
+            <Label 
+              htmlFor="billing-toggle" 
+              className={`text-sm font-medium transition-colors ${!isYearly ? 'text-foreground' : 'text-muted-foreground'}`}
+            >
+              Monthly
+            </Label>
+            <Switch
+              id="billing-toggle"
+              checked={isYearly}
+              onCheckedChange={setIsYearly}
+              className="data-[state=checked]:bg-primary"
+            />
+            <div className="flex items-center gap-2">
+              <Label 
+                htmlFor="billing-toggle" 
+                className={`text-sm font-medium transition-colors ${isYearly ? 'text-foreground' : 'text-muted-foreground'}`}
+              >
+                Yearly
+              </Label>
+              {isYearly && (
+                <span className="bg-accent text-accent-foreground text-xs font-semibold px-2 py-0.5 rounded-full">
+                  Save 37%
+                </span>
+              )}
+            </div>
+          </div>
         </div>
 
         <AdSpace format="horizontal" className="mb-8" slot="pricing-top" />
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
           {plans.map((plan) => (
             <Card 
               key={plan.name} 
@@ -166,6 +220,11 @@ const Pricing = () => {
                   {plan.description}
                 </CardDescription>
                 <div className="mt-4">
+                  {'originalPrice' in plan && plan.originalPrice && (
+                    <span className="text-muted-foreground line-through text-lg mr-2">
+                      {plan.originalPrice}
+                    </span>
+                  )}
                   <span className="text-4xl font-bold tracking-tight">
                     {plan.price}
                   </span>
@@ -175,6 +234,13 @@ const Pricing = () => {
                     </span>
                   )}
                 </div>
+                {'savings' in plan && plan.savings && (
+                  <div className="mt-2">
+                    <span className="bg-accent/20 text-accent-foreground text-sm font-medium px-2 py-1 rounded">
+                      {plan.savings}
+                    </span>
+                  </div>
+                )}
               </CardHeader>
 
               <CardContent className="space-y-4">
@@ -190,17 +256,13 @@ const Pricing = () => {
                 <Button 
                   className="w-full text-sm font-semibold"
                   variant={plan.popular ? "default" : "outline"}
-                  onClick={() => {
-                    if (plan.name === "Pro Monthly" || plan.name === "Pro Yearly") {
-                      handleSubscribe();
-                    } else {
-                      navigate('/auth');
-                    }
-                  }}
+                  onClick={plan.action}
                   disabled={loading !== null}
                 >
-                  {loading === "pro" && (plan.name === "Pro Monthly" || plan.name === "Pro Yearly") ? "Loading..." : 
-                   plan.cta}
+                  {(loading === "monthly" && plan.name === "Pro Monthly") || 
+                   (loading === "yearly" && plan.name === "Pro Yearly") 
+                    ? "Loading..." 
+                    : plan.cta}
                 </Button>
               </CardContent>
             </Card>
