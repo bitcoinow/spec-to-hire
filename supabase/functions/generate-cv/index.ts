@@ -43,7 +43,7 @@ serve(async (req) => {
     }
 
     const requestData = await req.json();
-    const { jobSpec, masterProfile } = requestData;
+    const { jobSpec, masterProfile, templateStyle = 'modern' } = requestData;
     
     // Input validation
     if (!jobSpec || typeof jobSpec !== 'string') {
@@ -79,15 +79,55 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    console.log('Processing CV generation request');
+    console.log('Processing CV generation request with template:', templateStyle);
 
-    // System prompt for the AI
+    // Get template-specific formatting
+    const templateFormats: Record<string, string> = {
+      modern: `FORMAT STYLE: Modern Professional
+- Use a clean two-column mental layout where appropriate
+- Include visual separators between sections (----)
+- Use bullet points with "•" symbol
+- Put skills in a compact, categorized format
+- Add subtle section markers like "▪" for subsections`,
+      
+      classic: `FORMAT STYLE: Classic Traditional
+- Use single column layout
+- Clear section headings in CAPITALS
+- Standard bullet points with "-"
+- Chronological experience listing
+- Conservative, formal tone throughout`,
+      
+      minimal: `FORMAT STYLE: Minimal Elegant
+- Maximum white space and breathing room
+- Section headings with simple underlines
+- Bullet points with "·"
+- Only essential information
+- Clean typography focus`,
+      
+      executive: `FORMAT STYLE: Executive Summary
+- Start with strong executive summary
+- Bold emphasis on achievements and metrics
+- Leadership and strategic focus
+- Section headings with "═" underlines
+- Professional and authoritative tone`,
+      
+      creative: `FORMAT STYLE: Creative Modern
+- Dynamic section ordering based on strengths
+- Use "→" for progression and achievements
+- Include relevant icons as text symbols where appropriate
+- Modern action-oriented language
+- Highlight unique value propositions`,
+    };
+
+    const templatePrompt = templateFormats[templateStyle] || templateFormats.modern;
     const systemPrompt = `You are an ATS coach. Given (A) Job Description and (B) Candidate Profile JSON:
 
 STEP 1: Extract must-have keywords from Job Description
 STEP 2: List skill/experience gaps between candidate and role requirements
 STEP 3: Produce a role-tailored CV in plain text sections using these headings: Summary, Skills, Experience, Education
 STEP 4: Draft a concise cover letter (≤200 words)
+
+${templatePrompt}
 
 ATS-SAFE FORMATTING RULES (CRITICAL):
 - Do NOT include tables or images

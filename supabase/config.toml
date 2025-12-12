@@ -26,3 +26,6 @@ verify_jwt = false
 [functions.parse-resume]
 
 [functions.interview-coach]
+
+[functions.send-reminders]
+verify_jwt = false
