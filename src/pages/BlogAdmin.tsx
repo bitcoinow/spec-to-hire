@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Sparkles, Trash2, Calendar as CalendarIcon } from "lucide-react";
+import { Loader2, Sparkles, Trash2, Calendar as CalendarIcon, Lightbulb } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Switch } from "@/components/ui/switch";
@@ -29,6 +29,8 @@ const BlogAdmin = () => {
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
   const [scheduledDate, setScheduledDate] = useState<Date | undefined>();
   const [showSchedulePicker, setShowSchedulePicker] = useState<string | null>(null);
+  const [suggestedTopics, setSuggestedTopics] = useState<string[]>([]);
+  const [generatingTopics, setGeneratingTopics] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -112,6 +114,32 @@ const BlogAdmin = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const generateTrendingTopics = async () => {
+    setGeneratingTopics(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-blog-topics", {
+        body: { category },
+      });
+
+      if (error) throw error;
+
+      setSuggestedTopics(data.topics || []);
+      toast({
+        title: "Topics generated!",
+        description: `Generated ${data.topics?.length || 0} trending topic ideas`,
+      });
+    } catch (error: any) {
+      console.error("Error generating topics:", error);
+      toast({
+        title: "Generation failed",
+        description: error.message || "Failed to generate topics",
+        variant: "destructive",
+      });
+    } finally {
+      setGeneratingTopics(false);
     }
   };
 
@@ -304,6 +332,47 @@ const BlogAdmin = () => {
                   onChange={(e) => setTopic(e.target.value)}
                   className="min-h-[100px]"
                 />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={generateTrendingTopics}
+                  disabled={generatingTopics}
+                  className="mt-2"
+                >
+                  {generatingTopics ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Lightbulb className="w-4 h-4 mr-2" />
+                      Generate Trending Topics
+                    </>
+                  )}
+                </Button>
+                {suggestedTopics.length > 0 && (
+                  <div className="mt-3 space-y-2">
+                    <p className="text-sm text-muted-foreground">Click a topic to use it:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {suggestedTopics.map((t, idx) => (
+                        <Button
+                          key={idx}
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => {
+                            setTopic(t);
+                            setSuggestedTopics([]);
+                          }}
+                          className="text-left h-auto py-2 px-3 whitespace-normal"
+                        >
+                          {t}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div>

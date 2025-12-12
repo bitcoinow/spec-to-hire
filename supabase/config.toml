@@ -14,6 +14,8 @@ project_id = "mggtjhyvmfjlcxjauqvt"
 
 [functions.generate-blog-images]
 
+[functions.generate-blog-topics]
+
 [functions.submit-waitlist]
 verify_jwt = false
 
