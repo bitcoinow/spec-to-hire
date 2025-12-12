@@ -65,6 +65,22 @@ serve(async (req) => {
       mode: "subscription",
       success_url: `${req.headers.get("origin")}/app?subscription=success`,
       cancel_url: `${req.headers.get("origin")}/app?subscription=cancelled`,
+      // Enable email receipts for payment confirmation
+      payment_intent_data: undefined, // Not applicable for subscriptions
+      subscription_data: {
+        metadata: {
+          user_id: user.id,
+        },
+      },
+      // Invoice settings ensure receipts are sent
+      invoice_creation: {
+        enabled: true,
+        invoice_data: {
+          metadata: {
+            user_id: user.id,
+          },
+        },
+      },
     });
 
     console.log(`[CREATE-CHECKOUT] Checkout session created: ${session.id}`);
