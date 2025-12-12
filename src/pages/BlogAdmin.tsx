@@ -317,6 +317,10 @@ const BlogAdmin = () => {
                     <SelectItem value="hiring_tips">Hiring Tips</SelectItem>
                     <SelectItem value="industry_trends">Industry Trends</SelectItem>
                     <SelectItem value="company_spotlight">Company Spotlight</SelectItem>
+                    <SelectItem value="tech_news">Tech News</SelectItem>
+                    <SelectItem value="ai_trends">AI & Automation</SelectItem>
+                    <SelectItem value="companies_hiring">Companies Hiring</SelectItem>
+                    <SelectItem value="market_insights">Market Insights</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
