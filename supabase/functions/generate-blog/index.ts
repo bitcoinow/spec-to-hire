@@ -30,7 +30,7 @@ serve(async (req) => {
       );
     }
     
-    const validCategories = ['job_news', 'hiring_tips', 'industry_trends', 'company_spotlight'];
+    const validCategories = ['job_news', 'hiring_tips', 'industry_trends', 'company_spotlight', 'tech_news', 'ai_trends', 'companies_hiring', 'market_insights'];
     if (!category || !validCategories.includes(category)) {
       return new Response(
         JSON.stringify({ error: `Invalid category: must be one of ${validCategories.join(', ')}` }),
@@ -84,18 +84,42 @@ serve(async (req) => {
       throw new Error('Unauthorized');
     }
 
-    console.log('Generating blog post for topic:', topic);
+    console.log('Generating blog post for topic:', topic, 'category:', category);
 
-    const systemPrompt = `You are an expert SEO content writer specializing in job market news and career advice. Generate comprehensive blog posts with proper SEO optimization and clear structure.`;
+    // Category-specific prompts for trending news
+    const categoryPrompts: Record<string, string> = {
+      job_news: 'Focus on current job market developments, employment statistics, and workforce trends.',
+      hiring_tips: 'Provide actionable hiring and job search strategies with current best practices.',
+      industry_trends: 'Analyze current industry shifts, emerging sectors, and career opportunities.',
+      company_spotlight: 'Highlight companies that are actively hiring, their culture, and opportunities.',
+      tech_news: 'Cover the latest technology news, software developments, and how they affect job seekers and tech professionals.',
+      ai_trends: 'Discuss current AI developments, automation impacts on jobs, AI tools for productivity, and AI-related career opportunities.',
+      companies_hiring: 'Report on major companies with active job openings, hiring sprees, and expansion news.',
+      market_insights: 'Provide economic analysis, salary trends, and job market forecasts.',
+    };
 
-    const userPrompt = `Write a detailed blog post about: ${topic}${jobSiteUrl ? `\n\nInclude information relevant to job seekers using ${jobSiteUrl}` : ''}
-    
-Important formatting requirements:
-- Use proper markdown structure with clear heading hierarchy
+    const categoryContext = categoryPrompts[category] || categoryPrompts.job_news;
+
+    const systemPrompt = `You are an expert journalist and SEO content writer specializing in job market news, technology, AI, and career advice. 
+You write timely, newsworthy content that covers current trends and breaking developments. 
+Your articles are well-researched, factual, and provide actionable insights for job seekers and professionals.
+Write as if reporting on current events in December 2024.
+${categoryContext}`;
+
+    const userPrompt = `Write a detailed, timely news article about: ${topic}
+
+Context: This is a ${category.replace(/_/g, ' ')} article. ${categoryContext}
+${jobSiteUrl ? `\nInclude relevant context for job seekers using ${jobSiteUrl}` : ''}
+
+Important requirements:
+- Write as current news/trending content (reference "recent developments", "this week", "latest reports")
+- Include specific details, statistics, and examples where relevant
+- Use proper markdown with clear heading hierarchy (## for H2, ### for H3)
 - Add blank lines between paragraphs for readability
-- Structure content with engaging subheadings
-- Include a comprehensive FAQ section with 5-7 relevant questions
-- Write in a conversational, engaging tone while maintaining professionalism`;
+- Include quotes or expert perspectives where appropriate
+- Add a comprehensive FAQ section with 5-7 relevant questions
+- Write in an engaging, journalistic tone while being informative
+- Include actionable takeaways for readers`;
 
     // Generate multiple images using AI (at least 3)
     const imageUrls: string[] = [];
@@ -139,6 +163,13 @@ Important formatting requirements:
 
     console.log(`Generated ${imageUrls.length} images for blog post`);
 
+    // Use different models based on category for variety and quality
+    const modelChoice = ['tech_news', 'ai_trends', 'market_insights'].includes(category) 
+      ? 'openai/gpt-5' 
+      : 'google/gemini-2.5-flash';
+    
+    console.log('Using model:', modelChoice);
+
     let response;
     try {
       response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -148,7 +179,7 @@ Important formatting requirements:
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'google/gemini-2.5-flash',
+          model: modelChoice,
           messages: [
             { role: 'system', content: systemPrompt },
             { role: 'user', content: userPrompt }

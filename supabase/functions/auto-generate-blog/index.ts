@@ -61,17 +61,57 @@ Deno.serve(async (req) => {
 
     console.log('Generating blog post via generate-blog function...');
 
-    // Generate topics based on categories
-    const topics = [
-      'Latest job market trends and opportunities',
-      'Career development tips for professionals',
-      'Remote work best practices and insights',
-      'Interview preparation strategies',
-      'Salary negotiation techniques'
-    ];
+    // Generate trending news topics based on categories
+    const topicsByCategory: Record<string, string[]> = {
+      job_news: [
+        'Breaking: Major shifts in the job market this week',
+        'Latest employment report reveals surprising trends',
+        'New hiring data shows which industries are booming',
+      ],
+      hiring_tips: [
+        'Top recruiters reveal what they look for in 2024',
+        'Interview techniques that are working right now',
+        'Resume trends employers are responding to',
+      ],
+      industry_trends: [
+        'Industries experiencing the biggest growth this month',
+        'Emerging career paths gaining traction',
+        'Sector analysis: Where the opportunities are',
+      ],
+      company_spotlight: [
+        'Companies with the most job openings this week',
+        'Tech giants announce major hiring initiatives',
+        'Startups disrupting the job market',
+      ],
+      tech_news: [
+        'Latest technology developments affecting the workforce',
+        'New tools transforming how we work',
+        'Tech industry hiring and layoff updates',
+      ],
+      ai_trends: [
+        'How AI is reshaping job roles across industries',
+        'New AI tools for job seekers and professionals',
+        'Automation trends and what they mean for your career',
+      ],
+      companies_hiring: [
+        'Companies actively hiring across multiple locations',
+        'Remote-first companies expanding their teams',
+        'Major employers announce new positions',
+      ],
+      market_insights: [
+        'Economic indicators and their impact on jobs',
+        'Salary trends and compensation updates',
+        'Labor market forecast for the coming months',
+      ],
+    };
+
+    const allCategories = settings.categories?.length > 0 
+      ? settings.categories 
+      : ['job_news', 'tech_news', 'ai_trends', 'companies_hiring'];
     
-    const randomTopic = topics[Math.floor(Math.random() * topics.length)];
-    const randomCategory = settings.categories[Math.floor(Math.random() * settings.categories.length)];
+    const randomCategory = allCategories[Math.floor(Math.random() * allCategories.length)];
+    const categoryTopics = topicsByCategory[randomCategory] || topicsByCategory.job_news;
+    const randomTopic = categoryTopics[Math.floor(Math.random() * categoryTopics.length)];
 
     // Call the generate-blog function
     const { data: blogData, error: generateError } = await supabaseClient.functions.invoke('generate-blog', {
