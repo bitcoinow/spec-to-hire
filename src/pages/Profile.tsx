@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { User, Mail, Save } from "lucide-react";
+import { User, Mail, Save, Settings } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { NotificationSettings } from "@/components/NotificationSettings";
 
 const Profile = () => {
   const [email, setEmail] = useState("");
@@ -95,8 +96,9 @@ const Profile = () => {
         </div>
 
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsList className="grid w-full max-w-md grid-cols-3">
             <TabsTrigger value="profile">Profile</TabsTrigger>
+            <TabsTrigger value="notifications">Notifications</TabsTrigger>
             <TabsTrigger value="account">Account</TabsTrigger>
           </TabsList>
 
@@ -158,12 +160,16 @@ const Profile = () => {
             </Card>
           </TabsContent>
 
+          <TabsContent value="notifications" className="mt-6">
+            <NotificationSettings />
+          </TabsContent>
+
           <TabsContent value="account" className="mt-6">
             <Card className="shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <div className="rounded-lg bg-primary/10 p-2">
-                    <Mail className="w-5 h-5 text-primary" />
+                    <Settings className="w-5 h-5 text-primary" />
                   </div>
                   Account Settings
                 </CardTitle>

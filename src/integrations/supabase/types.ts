@@ -253,6 +253,36 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          created_at: string
+          email_deadline_reminders: boolean
+          email_interview_reminders: boolean
+          id: string
+          reminder_days_before: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_deadline_reminders?: boolean
+          email_interview_reminders?: boolean
+          id?: string
+          reminder_days_before?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email_deadline_reminders?: boolean
+          email_interview_reminders?: boolean
+          id?: string
+          reminder_days_before?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null

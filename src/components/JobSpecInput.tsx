@@ -6,11 +6,13 @@ import { Sparkles, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import type { MasterProfile, GeneratedResults } from "@/pages/Index";
+import { getTemplatePrompt, type TemplateStyle } from "@/components/ResumeTemplates";
 
-interface JobSpecInputProps {
+export interface JobSpecInputProps {
   jobSpec: string;
   onJobSpecChange: (spec: string) => void;
   masterProfile: MasterProfile | null;
+  templateStyle?: TemplateStyle;
   onGenerate: (results: GeneratedResults) => void;
   isGenerating: boolean;
   setIsGenerating: (loading: boolean) => void;
@@ -20,6 +22,7 @@ export const JobSpecInput = ({
   jobSpec,
   onJobSpecChange,
   masterProfile,
+  templateStyle = "modern",
   onGenerate,
   isGenerating,
   setIsGenerating,
@@ -62,6 +65,7 @@ export const JobSpecInput = ({
         body: {
           jobSpec,
           masterProfile,
+          templateStyle,
         },
       });
 

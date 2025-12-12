@@ -9,6 +9,7 @@ import { PricingModal } from "@/components/PricingModal";
 import { ResumeImport } from "@/components/ResumeImport";
 import { JobTracker } from "@/components/JobTracker";
 import { InterviewCoach } from "@/components/InterviewCoach";
+import { ResumeTemplates, type TemplateStyle } from "@/components/ResumeTemplates";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSearchParams } from "react-router-dom";
@@ -76,6 +77,7 @@ const Index = () => {
   const defaultTab = searchParams.get('tab') === 'profile' ? 'profile' : 'generate';
   const [isPro, setIsPro] = useState(false);
   const [pricingOpen, setPricingOpen] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateStyle>("modern");
 
   // Load profile on mount
   useEffect(() => {
@@ -165,12 +167,17 @@ const Index = () => {
           </TabsList>
 
           <TabsContent value="generate" className="mt-6 space-y-6">
+            <ResumeTemplates 
+              selectedTemplate={selectedTemplate} 
+              onSelectTemplate={setSelectedTemplate} 
+            />
             <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-4 sm:space-y-6">
                 <JobSpecInput
                   jobSpec={jobSpec}
                   onJobSpecChange={setJobSpec}
                   masterProfile={masterProfile}
+                  templateStyle={selectedTemplate}
                   onGenerate={(generatedResults) => {
                     setResults(generatedResults);
                     setIsGenerating(false);
