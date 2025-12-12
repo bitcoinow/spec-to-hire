@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Check, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface PricingModalProps {
   open: boolean;
@@ -12,13 +14,16 @@ interface PricingModalProps {
 }
 
 export const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<string | null>(null);
+  const [isYearly, setIsYearly] = useState(false);
   const { toast } = useToast();
 
-  const handleSubscribe = async () => {
-    setLoading(true);
+  const handleSubscribe = async (billingInterval: "monthly" | "yearly") => {
+    setLoading(billingInterval);
     try {
-      const { data, error } = await supabase.functions.invoke('create-checkout');
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { billingInterval }
+      });
       
       if (error) throw error;
       
@@ -32,7 +37,7 @@ export const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setLoading(null);
     }
   };
 
@@ -47,6 +52,35 @@ export const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
             Select the plan that works best for you
           </DialogDescription>
         </DialogHeader>
+
+        {/* Billing Toggle */}
+        <div className="flex items-center justify-center gap-4 mt-4">
+          <Label 
+            htmlFor="modal-billing-toggle" 
+            className={`text-sm font-medium transition-colors ${!isYearly ? 'text-foreground' : 'text-muted-foreground'}`}
+          >
+            Monthly
+          </Label>
+          <Switch
+            id="modal-billing-toggle"
+            checked={isYearly}
+            onCheckedChange={setIsYearly}
+            className="data-[state=checked]:bg-primary"
+          />
+          <div className="flex items-center gap-2">
+            <Label 
+              htmlFor="modal-billing-toggle" 
+              className={`text-sm font-medium transition-colors ${isYearly ? 'text-foreground' : 'text-muted-foreground'}`}
+            >
+              Yearly
+            </Label>
+            {isYearly && (
+              <span className="bg-accent text-accent-foreground text-xs font-semibold px-2 py-0.5 rounded-full">
+                Save 37%
+              </span>
+            )}
+          </div>
+        </div>
 
         <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 mt-6">
           {/* Free Plan */}
@@ -99,12 +133,23 @@ export const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
             </div>
             <CardHeader className="space-y-4 pt-6">
               <div className="space-y-2">
-                <CardTitle className="text-xl sm:text-2xl">Pro</CardTitle>
-                <CardDescription className="text-sm sm:text-base">For serious job seekers</CardDescription>
+                <CardTitle className="text-xl sm:text-2xl">
+                  {isYearly ? "Pro Yearly" : "Pro Monthly"}
+                </CardTitle>
+                <CardDescription className="text-sm sm:text-base">
+                  {isYearly ? "Best value — save 37%" : "For serious job seekers"}
+                </CardDescription>
               </div>
               <div className="flex items-baseline gap-1">
-                <span className="text-4xl sm:text-5xl font-bold bg-gradient-primary bg-clip-text text-transparent">$3.99</span>
-                <span className="text-sm text-muted-foreground">/month</span>
+                {isYearly && (
+                  <span className="text-lg text-muted-foreground line-through mr-2">$47.88</span>
+                )}
+                <span className="text-4xl sm:text-5xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                  {isYearly ? "$29.99" : "$3.99"}
+                </span>
+                <span className="text-sm text-muted-foreground">
+                  {isYearly ? "/year" : "/month"}
+                </span>
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -142,10 +187,10 @@ export const PricingModal = ({ open, onOpenChange }: PricingModalProps) => {
               </ul>
               <Button 
                 className="w-full h-11 bg-gradient-primary hover:opacity-90 transition-opacity shadow-lg" 
-                onClick={handleSubscribe}
-                disabled={loading}
+                onClick={() => handleSubscribe(isYearly ? "yearly" : "monthly")}
+                disabled={loading !== null}
               >
-                {loading ? "Loading..." : "Upgrade to Pro"}
+                {loading ? "Loading..." : `Upgrade to Pro ${isYearly ? "Yearly" : "Monthly"}`}
               </Button>
             </CardContent>
           </Card>
