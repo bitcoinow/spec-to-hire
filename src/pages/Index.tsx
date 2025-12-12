@@ -6,6 +6,9 @@ import { ProfileEditor } from "@/components/ProfileEditor";
 import { ResultsPanel } from "@/components/ResultsPanel";
 import { AdSpace } from "@/components/AdSpace";
 import { PricingModal } from "@/components/PricingModal";
+import { ResumeImport } from "@/components/ResumeImport";
+import { JobTracker } from "@/components/JobTracker";
+import { InterviewCoach } from "@/components/InterviewCoach";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSearchParams } from "react-router-dom";
@@ -153,9 +156,12 @@ const Index = () => {
         )}
 
         <Tabs defaultValue={defaultTab} className="w-full">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 h-11">
-            <TabsTrigger value="generate" className="text-sm sm:text-base">Generate</TabsTrigger>
-            <TabsTrigger value="profile" className="text-sm sm:text-base">Master Profile</TabsTrigger>
+          <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-5 h-11">
+            <TabsTrigger value="generate" className="text-xs sm:text-sm">Generate</TabsTrigger>
+            <TabsTrigger value="profile" className="text-xs sm:text-sm">Profile</TabsTrigger>
+            <TabsTrigger value="import" className="text-xs sm:text-sm">Import</TabsTrigger>
+            <TabsTrigger value="tracker" className="text-xs sm:text-sm">Job Tracker</TabsTrigger>
+            <TabsTrigger value="interview" className="text-xs sm:text-sm">Interview</TabsTrigger>
           </TabsList>
 
           <TabsContent value="generate" className="mt-6 space-y-6">
@@ -192,6 +198,22 @@ const Index = () => {
               profile={masterProfile}
               onProfileChange={setMasterProfile}
             />
+          </TabsContent>
+
+          <TabsContent value="import" className="mt-6 max-w-2xl mx-auto">
+            <ResumeImport 
+              onProfileImported={(parsed) => {
+                setMasterProfile(parsed);
+              }}
+            />
+          </TabsContent>
+
+          <TabsContent value="tracker" className="mt-6">
+            <JobTracker />
+          </TabsContent>
+
+          <TabsContent value="interview" className="mt-6 max-w-3xl mx-auto">
+            <InterviewCoach />
           </TabsContent>
         </Tabs>
       </main>
