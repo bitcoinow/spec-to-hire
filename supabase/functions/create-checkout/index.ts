@@ -7,10 +7,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Price IDs for different billing intervals
+// Price IDs for different billing intervals (TEST MODE)
 const PRICE_IDS = {
-  monthly: "price_1SdTwIJyt0pEMwCOvoAQMdaf", // $3.99/month
-  yearly: "price_1SdTwKJyt0pEMwCODPNAVtyz",  // $29.99/year
+  monthly: "price_1SdVPOJyt0pEMwCOazxEBQDl", // $3.99/month
+  yearly: "price_1SdVPSJyt0pEMwCODPGCHxFG",  // $29.99/year
 };
 
 serve(async (req) => {
