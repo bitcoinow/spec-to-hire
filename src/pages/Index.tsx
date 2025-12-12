@@ -43,6 +43,7 @@ export interface MasterProfile {
     year: string;
   }>;
   certifications?: string[];
+  photo_url?: string | null;
 }
 
 export interface ParsedJob {
