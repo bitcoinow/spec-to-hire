@@ -138,6 +138,9 @@ ATS-SAFE FORMATTING RULES (CRITICAL):
 - Use consistent bullet formatting throughout
 - Font recommendation for export: Arial 10.5-11pt (body), 12-14pt (headings)
 - Line height: 1.0-1.15 for optimal ATS parsing
+- NEVER use special characters like %, #, *, @, or ª in section headers
+- Use only plain text headings with simple colons, e.g., "QA & Testing:" not "%ª QA & Testing:"
+- Section subheadings should be clean text only, no symbols or special formatting characters
 
 CV WRITING RULES:
 - Start each bullet with strong action verbs (led, built, designed, launched, etc.)
