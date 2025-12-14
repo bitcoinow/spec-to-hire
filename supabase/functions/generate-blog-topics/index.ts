@@ -12,6 +12,15 @@ serve(async (req) => {
 
   try {
     const { category } = await req.json();
+
+    // Validate category input
+    const validCategories = ['job_news', 'hiring_tips', 'industry_trends', 'company_spotlight', 'tech_news', 'ai_trends', 'companies_hiring', 'market_insights'];
+    if (!category || typeof category !== 'string' || !validCategories.includes(category)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid category. Must be one of: ' + validCategories.join(', ') }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
     
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {

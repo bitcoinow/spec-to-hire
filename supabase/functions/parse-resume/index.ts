@@ -14,9 +14,17 @@ serve(async (req) => {
   try {
     const { resumeText } = await req.json();
     
+    // Input validation with length limits
     if (!resumeText || typeof resumeText !== 'string') {
       return new Response(
         JSON.stringify({ error: 'Resume text is required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (resumeText.length < 50 || resumeText.length > 100000) {
+      return new Response(
+        JSON.stringify({ error: 'Resume text must be between 50 and 100,000 characters' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
