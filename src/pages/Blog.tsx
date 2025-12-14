@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, ExternalLink, Twitter, Linkedin, Facebook } from "lucide-react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import ReactMarkdown from "react-markdown";
@@ -15,6 +15,7 @@ const Blog = () => {
   const navigate = useNavigate();
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
   const [selectedPost, setSelectedPost] = useState<any>(null);
+  const [relatedPosts, setRelatedPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,12 +40,52 @@ const Blog = () => {
         return;
       }
       setSelectedPost(data);
+      loadRelatedPosts(data.category, data.id);
     } catch (error) {
       console.error("Error loading blog post:", error);
       navigate("/blog");
     } finally {
       setLoading(false);
     }
+  };
+
+  const loadRelatedPosts = async (category: string, currentPostId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("blog_posts")
+        .select("id, title, slug, excerpt, image_url, category, created_at")
+        .eq("published", true)
+        .eq("category", category)
+        .neq("id", currentPostId)
+        .order("created_at", { ascending: false })
+        .limit(3);
+
+      if (!error && data) {
+        setRelatedPosts(data);
+      }
+    } catch (error) {
+      console.error("Error loading related posts:", error);
+    }
+  };
+
+  const getShareUrl = () => {
+    return `${window.location.origin}/blog/${selectedPost?.slug}`;
+  };
+
+  const shareOnTwitter = () => {
+    const url = encodeURIComponent(getShareUrl());
+    const text = encodeURIComponent(selectedPost?.title || "");
+    window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, "_blank");
+  };
+
+  const shareOnLinkedIn = () => {
+    const url = encodeURIComponent(getShareUrl());
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, "_blank");
+  };
+
+  const shareOnFacebook = () => {
+    const url = encodeURIComponent(getShareUrl());
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, "_blank");
   };
 
   const loadBlogPosts = async () => {
@@ -100,13 +141,45 @@ const Blog = () => {
             <div className="mb-8">
               <Badge className="mb-4">{selectedPost.category}</Badge>
               <h1 className="text-4xl font-bold mb-4 text-foreground leading-tight">{selectedPost.title}</h1>
-              <p className="text-muted-foreground mb-6">
-                {new Date(selectedPost.created_at).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </p>
+              <div className="flex items-center justify-between flex-wrap gap-4 mb-6">
+                <p className="text-muted-foreground">
+                  {new Date(selectedPost.created_at).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground mr-2">Share:</span>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={shareOnTwitter}
+                    className="h-9 w-9"
+                    aria-label="Share on Twitter"
+                  >
+                    <Twitter className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={shareOnLinkedIn}
+                    className="h-9 w-9"
+                    aria-label="Share on LinkedIn"
+                  >
+                    <Linkedin className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={shareOnFacebook}
+                    className="h-9 w-9"
+                    aria-label="Share on Facebook"
+                  >
+                    <Facebook className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
               
               {selectedPost.image_url && (
                 <div className="w-full h-64 md:h-96 overflow-hidden rounded-lg mb-8">
@@ -168,6 +241,68 @@ const Blog = () => {
                     {tag}
                   </Badge>
                 ))}
+              </div>
+            )}
+
+            {/* Social Sharing - Bottom */}
+            <div className="mt-12 pt-8 border-t border-border">
+              <div className="flex items-center justify-center gap-4">
+                <span className="text-muted-foreground">Share this article:</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={shareOnTwitter}
+                  className="gap-2"
+                >
+                  <Twitter className="h-4 w-4" /> Twitter
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={shareOnLinkedIn}
+                  className="gap-2"
+                >
+                  <Linkedin className="h-4 w-4" /> LinkedIn
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={shareOnFacebook}
+                  className="gap-2"
+                >
+                  <Facebook className="h-4 w-4" /> Facebook
+                </Button>
+              </div>
+            </div>
+
+            {/* Related Posts Section */}
+            {relatedPosts.length > 0 && (
+              <div className="mt-16">
+                <h2 className="text-2xl font-bold mb-6 text-foreground">Related Articles</h2>
+                <div className="grid md:grid-cols-3 gap-6">
+                  {relatedPosts.map((post) => (
+                    <Card
+                      key={post.id}
+                      className="cursor-pointer hover:border-primary transition-all duration-300 hover:shadow-lg bg-card overflow-hidden"
+                      onClick={() => navigate(`/blog/${post.slug}`)}
+                    >
+                      {post.image_url && (
+                        <div className="w-full h-32 overflow-hidden">
+                          <img 
+                            src={post.image_url} 
+                            alt={post.title}
+                            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                            loading="lazy"
+                          />
+                        </div>
+                      )}
+                      <CardHeader className="p-4">
+                        <Badge className="w-fit mb-2 text-xs">{post.category}</Badge>
+                        <CardTitle className="text-base text-card-foreground line-clamp-2">{post.title}</CardTitle>
+                      </CardHeader>
+                    </Card>
+                  ))}
+                </div>
               </div>
             )}
           </article>
