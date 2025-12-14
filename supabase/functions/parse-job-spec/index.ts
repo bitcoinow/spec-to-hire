@@ -21,9 +21,17 @@ serve(async (req) => {
   try {
     const { jobSpec } = await req.json();
 
-    if (!jobSpec) {
+    // Input validation with length limits
+    if (!jobSpec || typeof jobSpec !== 'string') {
       return new Response(
         JSON.stringify({ error: 'Job specification is required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (jobSpec.length < 10 || jobSpec.length > 50000) {
+      return new Response(
+        JSON.stringify({ error: 'Job specification must be between 10 and 50,000 characters' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
