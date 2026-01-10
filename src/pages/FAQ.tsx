@@ -1,11 +1,54 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Briefcase, ArrowLeft, HelpCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Briefcase, ArrowLeft, HelpCircle, Send, Loader2 } from "lucide-react";
 import { Helmet } from "react-helmet-async";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const FAQ = () => {
+  const { toast } = useToast();
+  const [contactForm, setContactForm] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('send-contact-email', {
+        body: contactForm
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Message sent!",
+        description: "We've received your message and will get back to you soon.",
+      });
+
+      setContactForm({ name: "", email: "", subject: "", message: "" });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const faqCategories = [
     {
       category: "General",
@@ -132,7 +175,7 @@ const FAQ = () => {
         },
         {
           question: "How do I contact support?",
-          answer: "You can reach our support team by visiting the FAQ page and using the contact options, or by emailing support directly. Pro subscribers receive priority support with faster response times.",
+          answer: "You can reach our support team using the contact form below, or by emailing support directly. Pro subscribers receive priority support with faster response times.",
         },
         {
           question: "What if I encounter a technical issue?",
@@ -215,8 +258,88 @@ const FAQ = () => {
           ))}
         </div>
 
+        {/* Contact Form */}
+        <Card className="mt-12 shadow-lg" id="contact">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Send className="w-5 h-5" />
+              Contact Us
+            </CardTitle>
+            <CardDescription>
+              Can't find what you're looking for? Send us a message and we'll get back to you within 24-48 hours.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleContactSubmit} className="space-y-4">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Name</Label>
+                  <Input
+                    id="name"
+                    placeholder="Your name"
+                    value={contactForm.name}
+                    onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
+                    required
+                    minLength={2}
+                    maxLength={100}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your@email.com"
+                    value={contactForm.email}
+                    onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="subject">Subject</Label>
+                <Input
+                  id="subject"
+                  placeholder="How can we help?"
+                  value={contactForm.subject}
+                  onChange={(e) => setContactForm({ ...contactForm, subject: e.target.value })}
+                  required
+                  minLength={3}
+                  maxLength={200}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="message">Message</Label>
+                <Textarea
+                  id="message"
+                  placeholder="Tell us more about your question or issue..."
+                  value={contactForm.message}
+                  onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                  required
+                  minLength={10}
+                  maxLength={5000}
+                  rows={5}
+                />
+              </div>
+              <Button type="submit" className="w-full sm:w-auto" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4 mr-2" />
+                    Send Message
+                  </>
+                )}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+
         <div className="mt-12 text-center">
-          <h2 className="text-2xl font-bold mb-4">Still have questions?</h2>
+          <h2 className="text-2xl font-bold mb-4">Need more help?</h2>
           <p className="text-muted-foreground mb-6">
             Check out our How to Use guide for detailed step-by-step instructions
           </p>

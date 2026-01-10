@@ -119,10 +119,40 @@ const Index = () => {
         console.error('Error checking subscription:', error);
       }
     };
+
+    // Handle successful subscription - send welcome email
+    const handleSubscriptionSuccess = async () => {
+      const subscriptionStatus = searchParams.get('subscription');
+      const planType = searchParams.get('plan');
+      
+      if (subscriptionStatus === 'success' && planType) {
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user?.email) {
+            const planNames: Record<string, string> = {
+              weekly: "Pro Weekly ($3.99/week)",
+              monthly: "Pro Monthly ($12.99/month)",
+              yearly: "Pro Yearly ($79.99/year)",
+            };
+            
+            await supabase.functions.invoke('send-welcome-email', {
+              body: { 
+                email: user.email, 
+                planName: planNames[planType] || planNames.monthly 
+              }
+            });
+            console.log('Welcome email sent successfully');
+          }
+        } catch (error) {
+          console.error('Error sending welcome email:', error);
+        }
+      }
+    };
     
     loadProfile();
     checkSubscription();
-  }, []);
+    handleSubscriptionSuccess();
+  }, [searchParams]);
 
   return (
     <div className="min-h-screen bg-background">
