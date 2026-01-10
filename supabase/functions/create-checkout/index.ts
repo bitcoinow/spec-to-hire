@@ -14,6 +14,13 @@ const PRICE_IDS = {
   yearly: "price_1SdVh6Jyt0pEMwCOWh2AbUeA",  // $79.99/year
 };
 
+// Plan names for welcome emails
+const PLAN_NAMES: Record<string, string> = {
+  weekly: "Pro Weekly ($3.99/week)",
+  monthly: "Pro Monthly ($12.99/month)",
+  yearly: "Pro Yearly ($79.99/year)",
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -52,6 +59,7 @@ serve(async (req) => {
 
     // Get the appropriate price ID based on billing interval
     const priceId = PRICE_IDS[billingInterval as keyof typeof PRICE_IDS] || PRICE_IDS.monthly;
+    const planName = PLAN_NAMES[billingInterval as keyof typeof PLAN_NAMES] || PLAN_NAMES.monthly;
     console.log(`[CREATE-CHECKOUT] Using price ID: ${priceId}`);
 
     const session = await stripe.checkout.sessions.create({
@@ -64,13 +72,15 @@ serve(async (req) => {
         },
       ],
       mode: "subscription",
-      success_url: `${req.headers.get("origin")}/app?subscription=success`,
+      success_url: `${req.headers.get("origin")}/app?subscription=success&plan=${billingInterval}`,
       cancel_url: `${req.headers.get("origin")}/app?subscription=cancelled`,
       // Enable email receipts for payment confirmation
       payment_intent_data: undefined, // Not applicable for subscriptions
       subscription_data: {
         metadata: {
           user_id: user.id,
+          plan_name: planName,
+          billing_interval: billingInterval,
         },
       },
       // Invoice settings ensure receipts are sent
