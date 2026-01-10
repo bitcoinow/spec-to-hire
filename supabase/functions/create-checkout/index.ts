@@ -9,6 +9,7 @@ const corsHeaders = {
 
 // Price IDs for different billing intervals
 const PRICE_IDS = {
+  weekly: "price_1SnsIDJyt0pEMwCOM89uwilQ",  // $3.99/week
   monthly: "price_1SdVh4Jyt0pEMwCOoUytftDt", // $12.99/month
   yearly: "price_1SdVh6Jyt0pEMwCOWh2AbUeA",  // $79.99/year
 };

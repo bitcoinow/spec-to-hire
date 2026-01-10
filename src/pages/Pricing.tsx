@@ -8,16 +8,14 @@ import { useToast } from "@/hooks/use-toast";
 import { Helmet } from "react-helmet-async";
 import { AdSpace } from "@/components/AdSpace";
 import logo from "@/assets/spec2hire-logo.png";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 
 const Pricing = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState<string | null>(null);
-  const [isYearly, setIsYearly] = useState(false);
+  const [billingPeriod, setBillingPeriod] = useState<"weekly" | "monthly" | "yearly">("monthly");
 
-  const handleSubscribe = async (billingInterval: "monthly" | "yearly") => {
+  const handleSubscribe = async (billingInterval: "weekly" | "monthly" | "yearly") => {
     setLoading(billingInterval);
     try {
       const { data, error } = await supabase.functions.invoke('create-checkout', {
@@ -46,8 +44,44 @@ const Pricing = () => {
     features: string[];
     cta: string;
     popular: boolean;
+    billingKey?: "weekly" | "monthly" | "yearly";
     action: () => void;
   }
+
+  const weeklyPlans: Plan[] = [
+    {
+      name: "Free Trial",
+      price: "$0",
+      description: "Try before you buy",
+      features: [
+        "1 CV generation",
+        "1 cover letter",
+        "ATS-optimized format",
+        "PDF export",
+      ],
+      cta: "Start Free Trial",
+      popular: false,
+      action: () => navigate('/auth'),
+    },
+    {
+      name: "Pro Weekly",
+      price: "$3.99",
+      period: "/week",
+      description: "Flexible weekly billing",
+      features: [
+        "Unlimited CV generations",
+        "Unlimited cover letters",
+        "ATS-optimized format",
+        "PDF & DOCX export",
+        "Master profile storage",
+        "Match score analysis",
+      ],
+      cta: "Get Started",
+      popular: true,
+      billingKey: "weekly",
+      action: () => handleSubscribe("weekly"),
+    },
+  ];
 
   const monthlyPlans: Plan[] = [
     {
@@ -80,6 +114,7 @@ const Pricing = () => {
       ],
       cta: "Get Started",
       popular: true,
+      billingKey: "monthly",
       action: () => handleSubscribe("monthly"),
     },
   ];
@@ -114,17 +149,22 @@ const Pricing = () => {
       ],
       cta: "Get Yearly",
       popular: true,
+      billingKey: "yearly",
       action: () => handleSubscribe("yearly"),
     },
   ];
 
-  const plans: Plan[] = isYearly ? yearlyPlans : monthlyPlans;
+  const plans: Plan[] = billingPeriod === "weekly" 
+    ? weeklyPlans 
+    : billingPeriod === "yearly" 
+    ? yearlyPlans 
+    : monthlyPlans;
 
   return (
     <>
       <Helmet>
         <title>Pricing — Spec2Hire</title>
-        <meta name="description" content="Choose your plan: Free trial, Pro Monthly ($12.99/month), or Pro Yearly ($79.99/year) for unlimited CVs." />
+        <meta name="description" content="Choose your plan: Free trial, Pro Weekly ($3.99/week), Pro Monthly ($12.99/month), or Pro Yearly ($79.99/year) for unlimited CVs." />
         <link rel="canonical" href="https://spec-to-hire.lovable.app/pricing" />
       </Helmet>
       <div className="min-h-screen bg-background">
@@ -166,33 +206,35 @@ const Pricing = () => {
             Choose the plan that works for you. No hidden fees.
           </p>
 
-          {/* Billing Toggle */}
-          <div className="flex items-center justify-center gap-4 mb-8">
-            <Label 
-              htmlFor="billing-toggle" 
-              className={`text-sm font-medium transition-colors ${!isYearly ? 'text-foreground' : 'text-muted-foreground'}`}
+          {/* Billing Period Toggle */}
+          <div className="flex items-center justify-center gap-2 mb-8">
+            <Button
+              variant={billingPeriod === "weekly" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setBillingPeriod("weekly")}
+              className="rounded-r-none"
+            >
+              Weekly
+            </Button>
+            <Button
+              variant={billingPeriod === "monthly" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setBillingPeriod("monthly")}
+              className="rounded-none border-x-0"
             >
               Monthly
-            </Label>
-            <Switch
-              id="billing-toggle"
-              checked={isYearly}
-              onCheckedChange={setIsYearly}
-              className="data-[state=checked]:bg-primary"
-            />
-            <div className="flex items-center gap-2">
-              <Label 
-                htmlFor="billing-toggle" 
-                className={`text-sm font-medium transition-colors ${isYearly ? 'text-foreground' : 'text-muted-foreground'}`}
-              >
-                Yearly
-              </Label>
-              {isYearly && (
-              <span className="bg-accent text-accent-foreground text-xs font-semibold px-2 py-0.5 rounded-full">
-                  Save 49%
-                </span>
-              )}
-            </div>
+            </Button>
+            <Button
+              variant={billingPeriod === "yearly" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setBillingPeriod("yearly")}
+              className="rounded-l-none"
+            >
+              Yearly
+              <span className="ml-2 bg-accent text-accent-foreground text-xs font-semibold px-1.5 py-0.5 rounded">
+                -49%
+              </span>
+            </Button>
           </div>
         </div>
 
@@ -259,10 +301,7 @@ const Pricing = () => {
                   onClick={plan.action}
                   disabled={loading !== null}
                 >
-                  {(loading === "monthly" && plan.name === "Pro Monthly") || 
-                   (loading === "yearly" && plan.name === "Pro Yearly") 
-                    ? "Loading..." 
-                    : plan.cta}
+                  {loading === plan.billingKey ? "Loading..." : plan.cta}
                 </Button>
               </CardContent>
             </Card>
